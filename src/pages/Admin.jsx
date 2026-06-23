@@ -2,42 +2,65 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Package, FolderOpen, Inbox, X, Upload, Image } from 'lucide-react';
+import { Plus, Pencil, Trash2, Package, FolderOpen, Inbox, X, Upload, Image, ShoppingCart, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/AuthContext';
 import ProductForm from '@/components/admin/ProductForm';
 import CategoryManager from '@/components/admin/CategoryManager';
 import InquiryManager from '@/components/admin/InquiryManager';
+import OrderManager from '@/components/admin/OrderManager';
 
 const tabs = [
   { key: 'products', icon: Package, label: { ru: 'Товары', tj: 'Молҳо' } },
   { key: 'categories', icon: FolderOpen, label: { ru: 'Категории', tj: 'Категорияҳо' } },
+  { key: 'orders', icon: ShoppingCart, label: { ru: 'Заказы', tj: 'Фармоишҳо' } },
   { key: 'inquiries', icon: Inbox, label: { ru: 'Заявки', tj: 'Дархостҳо' } },
 ];
 
 export default function Admin() {
   const { lang } = useLanguage();
+  const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [inquiries, setInquiries] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingProduct, setEditingProduct] = useState(null);
   const [showProductForm, setShowProductForm] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
-    const [prods, cats, inqs] = await Promise.all([
+    const [prods, cats, inqs, ords] = await Promise.all([
       base44.entities.Product.list('-created_date'),
       base44.entities.Category.list('order'),
       base44.entities.Inquiry.list('-created_date'),
+      base44.entities.Order.list('-created_date'),
     ]);
     setProducts(prods);
     setCategories(cats);
     setInquiries(inqs);
+    setOrders(ords);
     setLoading(false);
   };
 
   useEffect(() => { loadData(); }, []);
+
+  if (!isAuthenticated || user?.role !== 'admin') {
+    return (
+      <div className="min-h-screen pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A] flex items-center">
+        <div className="max-w-md mx-auto px-4 text-center w-full">
+          <ShieldAlert className="w-16 h-16 mx-auto text-[#E61D25]/30 mb-4" />
+          <h1 className="text-xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9] mb-2">
+            {lang === 'ru' ? 'Доступ запрещён' : 'Дастрасӣ манъ аст'}
+          </h1>
+          <p className="text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 text-sm">
+            {lang === 'ru' ? 'Эта страница доступна только администраторам.' : 'Ин саҳифа танҳо барои администраторҳо дастрас аст.'}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const deleteProduct = async (id) => {
     await base44.entities.Product.delete(id);
@@ -144,6 +167,7 @@ export default function Admin() {
             )}
 
             {activeTab === 'categories' && <CategoryManager categories={categories} onUpdate={loadData} />}
+            {activeTab === 'orders' && <OrderManager orders={orders} onUpdate={loadData} />}
             {activeTab === 'inquiries' && <InquiryManager inquiries={inquiries} onUpdate={loadData} />}
           </>
         )}

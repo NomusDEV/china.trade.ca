@@ -3,14 +3,18 @@ import { useParams, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MessageCircle, Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Package, ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus } from 'lucide-react';
+import { useCart } from '@/lib/CartContext.jsx';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const { lang, t } = useLanguage();
+  const { addItem } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [qty, setQty] = useState(1);
+  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     base44.entities.Product.get(id)
@@ -126,6 +130,34 @@ export default function ProductDetail() {
                 <p className="text-sm text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 leading-relaxed whitespace-pre-wrap">{getSpecs()}</p>
               </div>
             )}
+
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setQty(Math.max(product.moq || 1, qty - 1))}
+                  className="w-10 h-10 rounded-lg border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 flex items-center justify-center text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 hover:border-[#C5A059] transition-colors"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="w-12 text-center text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9]">{qty}</span>
+                <button
+                  onClick={() => setQty(qty + 1)}
+                  className="w-10 h-10 rounded-lg border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 flex items-center justify-center text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 hover:border-[#C5A059] transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+              <button
+                onClick={() => {
+                  addItem(product, qty);
+                  setAdded(true);
+                  setTimeout(() => setAdded(false), 2000);
+                }}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#C5A059] to-[#C5A059]/80 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-[#C5A059]/30 transition-all text-sm"
+              >
+                <ShoppingCart className="w-5 h-5" /> {added ? t('cart.addedToCart') : t('cart.addToCart')}
+              </button>
+            </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
               <a

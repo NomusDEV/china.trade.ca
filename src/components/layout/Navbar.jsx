@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sun, Moon, Globe } from 'lucide-react';
+import { Menu, X, Sun, Moon, Globe, ShoppingCart, LogOut, Shield } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { useTheme } from '@/lib/theme.jsx';
+import { useAuth } from '@/lib/AuthContext';
+import { useCart } from '@/lib/CartContext.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
   const { lang, setLang, t } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
+  const { user, isAuthenticated, logout } = useAuth();
+  const { count: cartCount } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -66,6 +70,42 @@ export default function Navbar() {
 
           {/* Controls */}
           <div className="flex items-center gap-2">
+            <Link
+              to="/cart"
+              className="relative p-2 rounded-lg text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:text-[#C5A059] hover:bg-[#0A0A0A]/5 dark:hover:bg-[#F9F9F9]/5 transition-all duration-300"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#E61D25] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+            {isAuthenticated ? (
+              <>
+                {user?.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#C5A059]/10 text-[#C5A059] hover:bg-[#C5A059]/20 transition-all"
+                  >
+                    <Shield className="w-3.5 h-3.5" /> {t('nav.admin')}
+                  </Link>
+                )}
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:border-[#E61D25] hover:text-[#E61D25] transition-all"
+                >
+                  <LogOut className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('auth.logout')}</span>
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#0A0A0A] dark:bg-[#F9F9F9] text-white dark:text-[#0A0A0A] hover:opacity-80 transition-all"
+              >
+                {t('auth.login')}
+              </Link>
+            )}
             <button
               onClick={() => setLang(lang === 'ru' ? 'tj' : 'ru')}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:border-[#C5A059] hover:text-[#C5A059] transition-all duration-300"
@@ -112,6 +152,25 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <Link to="/cart" className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70">
+                <ShoppingCart className="w-4 h-4" /> {t('cart.title')} {cartCount > 0 && `(${cartCount})`}
+              </Link>
+              {isAuthenticated ? (
+                <>
+                  {user?.role === 'admin' && (
+                    <Link to="/admin" className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-[#C5A059]">
+                      <Shield className="w-4 h-4" /> {t('nav.admin')}
+                    </Link>
+                  )}
+                  <button onClick={logout} className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 w-full">
+                    <LogOut className="w-4 h-4" /> {t('auth.logout')}
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" className="block px-4 py-3 rounded-lg text-sm font-medium text-[#E61D25]">
+                  {t('auth.login')}
+                </Link>
+              )}
             </div>
           </motion.div>
         )}

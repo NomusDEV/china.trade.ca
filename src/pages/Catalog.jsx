@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
-import { Search, ShieldCheck, Package } from 'lucide-react';
+import { Search, ShieldCheck, Package, ShoppingCart } from 'lucide-react';
+import { useCart } from '@/lib/CartContext.jsx';
 
 export default function Catalog() {
   const { lang, t } = useLanguage();
+  const { addItem } = useCart();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -130,6 +132,16 @@ export default function Catalog() {
                       </div>
                       <span className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('catalog.moq')}: {product.moq}</span>
                     </div>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addItem(product, Math.max(product.moq || 1, 1));
+                      }}
+                      className="mt-3 w-full py-2 bg-[#E61D25] text-white text-xs font-semibold rounded-lg hover:bg-[#E61D25]/90 transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <ShoppingCart className="w-3.5 h-3.5" /> {t('cart.addToCart')}
+                    </button>
                   </div>
                 </Link>
               </motion.div>
