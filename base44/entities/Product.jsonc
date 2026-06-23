@@ -1,0 +1,63 @@
+{
+  "name": "Product",
+  "type": "object",
+  "properties": {
+    "name_ru": {
+      "type": "string",
+      "description": "Product name in Russian"
+    },
+    "name_tj": {
+      "type": "string",
+      "description": "Product name in Tajik"
+    },
+    "description_ru": {
+      "type": "string",
+      "description": "Product description in Russian"
+    },
+    "description_tj": {
+      "type": "string",
+      "description": "Product description in Tajik"
+    },
+    "category": {
+      "type": "string",
+      "description": "Product category"
+    },
+    "price": {
+      "type": "number",
+      "description": "Wholesale price in USD"
+    },
+    "moq": {
+      "type": "number",
+      "description": "Minimum order quantity"
+    },
+    "specifications_ru": {
+      "type": "string",
+      "description": "Product specifications in Russian"
+    },
+    "specifications_tj": {
+      "type": "string",
+      "description": "Product specifications in Tajik"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of product image URLs"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "name_ru",
+    "category",
+    "price",
+    "moq"
+  ]
+}

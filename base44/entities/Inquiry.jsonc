@@ -1,0 +1,36 @@
+{
+  "name": "Inquiry",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Client name"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Client phone number"
+    },
+    "message": {
+      "type": "string",
+      "description": "Client message"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "Related product ID if any"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "in_progress",
+        "completed"
+      ],
+      "default": "new"
+    }
+  },
+  "required": [
+    "name",
+    "phone",
+    "message"
+  ]
+}

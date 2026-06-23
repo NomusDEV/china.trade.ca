@@ -1,0 +1,25 @@
+{
+  "name": "Category",
+  "type": "object",
+  "properties": {
+    "name_ru": {
+      "type": "string",
+      "description": "Category name in Russian"
+    },
+    "name_tj": {
+      "type": "string",
+      "description": "Category name in Tajik"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon name from lucide-react"
+    },
+    "order": {
+      "type": "number",
+      "description": "Display order"
+    }
+  },
+  "required": [
+    "name_ru"
+  ]
+}
