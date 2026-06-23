@@ -11,6 +11,7 @@ import { ThemeProvider } from '@/lib/theme.jsx';
 
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { CartProvider } from '@/lib/CartContext.jsx';
+import { SiteSettingsProvider } from '@/lib/SiteSettingsContext.jsx';
 import SiteLayout from '@/components/layout/SiteLayout';
 import Home from '@/pages/Home';
 import Catalog from '@/pages/Catalog';
@@ -74,13 +75,15 @@ function App() {
       <ThemeProvider>
         <LanguageProvider>
           <CartProvider>
-            <QueryClientProvider client={queryClientInstance}>
+            <SiteSettingsProvider>
+              <QueryClientProvider client={queryClientInstance}>
             <Router>
               <ScrollToTop />
               <AuthenticatedApp />
             </Router>
-              <Toaster />
-            </QueryClientProvider>
+                <Toaster />
+              </QueryClientProvider>
+            </SiteSettingsProvider>
           </CartProvider>
         </LanguageProvider>
       </ThemeProvider>

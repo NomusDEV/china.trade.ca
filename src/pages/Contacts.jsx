@@ -4,9 +4,11 @@ import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
 import { MessageCircle, Mail, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
 
 export default function Contacts() {
   const { t } = useLanguage();
+  const { settings, telegramLink, whatsappLink, emailLink } = useSiteSettings();
   const [form, setForm] = useState({ name: '', phone: '', message: '' });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -25,11 +27,11 @@ export default function Contacts() {
   };
 
   const channels = [
-    { name: 'Telegram', href: 'https://t.me/chinatradeca', icon: MessageCircle },
-    { name: 'WhatsApp', href: 'https://wa.me/chinatradeca', icon: MessageCircle },
-    { name: 'WeChat', href: '#', icon: MessageCircle, label: 'chinatradeca' },
-    { name: 'Email', href: 'mailto:info@chinatrade.ca', icon: Mail, label: 'info@chinatrade.ca' },
-  ];
+    settings.telegram && { name: 'Telegram', href: telegramLink, icon: MessageCircle, label: settings.telegram },
+    settings.whatsapp && { name: 'WhatsApp', href: whatsappLink, icon: MessageCircle, label: settings.whatsapp },
+    settings.wechat && { name: 'WeChat', href: '#', icon: MessageCircle, label: settings.wechat },
+    settings.email && { name: 'Email', href: emailLink, icon: Mail, label: settings.email },
+  ].filter(Boolean);
 
   return (
     <div className="min-h-screen pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">

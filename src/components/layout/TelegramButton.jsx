@@ -1,11 +1,16 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
 
 export default function TelegramButton() {
+  const { settings, telegramLink } = useSiteSettings();
+
+  if (!settings.telegram) return null;
+
   return (
     <motion.a
-      href="https://t.me/chinatradeca"
+      href={telegramLink}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-br from-[#E61D25] to-[#C5A059] rounded-full flex items-center justify-center shadow-lg shadow-[#E61D25]/30 hover:shadow-[#E61D25]/50 transition-shadow"

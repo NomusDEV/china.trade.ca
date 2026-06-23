@@ -2,19 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Package, FolderOpen, Inbox, X, Upload, Image, ShoppingCart, ShieldAlert } from 'lucide-react';
+import { Plus, Pencil, Trash2, Package, FolderOpen, Inbox, X, Upload, Image, ShoppingCart, ShieldAlert, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/AuthContext';
+import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
 import ProductForm from '@/components/admin/ProductForm';
 import CategoryManager from '@/components/admin/CategoryManager';
 import InquiryManager from '@/components/admin/InquiryManager';
 import OrderManager from '@/components/admin/OrderManager';
+import SiteSettingsManager from '@/components/admin/SiteSettingsManager';
 
 const tabs = [
   { key: 'products', icon: Package, label: { ru: 'Товары', tj: 'Молҳо' } },
   { key: 'categories', icon: FolderOpen, label: { ru: 'Категории', tj: 'Категорияҳо' } },
   { key: 'orders', icon: ShoppingCart, label: { ru: 'Заказы', tj: 'Фармоишҳо' } },
   { key: 'inquiries', icon: Inbox, label: { ru: 'Заявки', tj: 'Дархостҳо' } },
+  { key: 'settings', icon: Settings, label: { ru: 'Настройки', tj: 'Танзимотҳо' } },
 ];
 
 export default function Admin() {
@@ -169,6 +172,7 @@ export default function Admin() {
             {activeTab === 'categories' && <CategoryManager categories={categories} onUpdate={loadData} />}
             {activeTab === 'orders' && <OrderManager orders={orders} onUpdate={loadData} />}
             {activeTab === 'inquiries' && <InquiryManager inquiries={inquiries} onUpdate={loadData} />}
+            {activeTab === 'settings' && <SiteSettingsManager />}
           </>
         )}
       </div>

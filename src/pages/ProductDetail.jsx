@@ -5,11 +5,13 @@ import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MessageCircle, Package, ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus } from 'lucide-react';
 import { useCart } from '@/lib/CartContext.jsx';
+import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const { lang, t } = useLanguage();
   const { addItem } = useCart();
+  const { telegramLink, whatsappLink } = useSiteSettings();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
@@ -46,6 +48,8 @@ export default function ProductDetail() {
   const images = product.images?.length ? product.images : [];
   const telegramMsg = encodeURIComponent(`Здравствуйте! Меня интересует товар: ${product.name_ru} (ID: ${product.id})`);
   const whatsappMsg = encodeURIComponent(`Здравствуйте! Меня интересует товар: ${product.name_ru} (ID: ${product.id})`);
+  const telegramHref = telegramLink !== '#' ? `${telegramLink}?text=${telegramMsg}` : '#';
+  const whatsappHref = whatsappLink !== '#' ? `${whatsappLink}?text=${whatsappMsg}` : '#';
 
   return (
     <div className="min-h-screen pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
@@ -161,7 +165,7 @@ export default function ProductDetail() {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <a
-                href={`https://t.me/chinatradeca?text=${telegramMsg}`}
+                href={telegramHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#E61D25] to-[#E61D25]/80 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-[#E61D25]/30 transition-all text-sm"
@@ -169,7 +173,7 @@ export default function ProductDetail() {
                 <MessageCircle className="w-5 h-5" /> {t('product.contactTelegram')}
               </a>
               <a
-                href={`https://wa.me/chinatradeca?text=${whatsappMsg}`}
+                href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 text-[#0A0A0A] dark:text-[#F9F9F9] font-semibold rounded-xl hover:border-[#C5A059] transition-all text-sm"

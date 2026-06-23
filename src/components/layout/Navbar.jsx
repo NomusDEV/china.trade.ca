@@ -5,6 +5,7 @@ import { useLanguage } from '@/lib/i18n.jsx';
 import { useTheme } from '@/lib/theme.jsx';
 import { useAuth } from '@/lib/AuthContext';
 import { useCart } from '@/lib/CartContext.jsx';
+import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
@@ -12,6 +13,7 @@ export default function Navbar() {
   const { isDark, toggleTheme } = useTheme();
   const { user, isAuthenticated, logout } = useAuth();
   const { count: cartCount } = useCart();
+  const { settings } = useSiteSettings();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -46,7 +48,7 @@ export default function Navbar() {
               <span className="text-white font-bold text-sm lg:text-base">CT</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-sm lg:text-base text-[#0A0A0A] dark:text-[#F9F9F9] tracking-tight">China.Trade.CA</span>
+              <span className="font-bold text-sm lg:text-base text-[#0A0A0A] dark:text-[#F9F9F9] tracking-tight">{settings.company_name}</span>
               <span className="text-[10px] text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 -mt-0.5 hidden sm:block">Central Asia</span>
             </div>
           </Link>

@@ -1,0 +1,41 @@
+{
+  "name": "SiteSetting",
+  "type": "object",
+  "properties": {
+    "company_name": {
+      "type": "string",
+      "description": "Company name displayed in header/footer"
+    },
+    "telegram": {
+      "type": "string",
+      "description": "Telegram username or link (e.g. chinatradeca or https://t.me/chinatradeca)"
+    },
+    "whatsapp": {
+      "type": "string",
+      "description": "WhatsApp number or link (e.g. chinatradeca or https://wa.me/1234567890)"
+    },
+    "wechat": {
+      "type": "string",
+      "description": "WeChat ID"
+    },
+    "email": {
+      "type": "string",
+      "description": "Contact email address"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "address_ru": {
+      "type": "string",
+      "description": "Company address in Russian"
+    },
+    "address_tj": {
+      "type": "string",
+      "description": "Company address in Tajik"
+    }
+  },
+  "required": [
+    "company_name"
+  ]
+}
