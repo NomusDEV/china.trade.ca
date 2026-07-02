@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { useAuth } from '@/lib/AuthContext';
+import { useUnreadMessages } from '@/lib/useUnreadMessages';
 import { motion } from 'framer-motion';
 import { User, ShoppingBag, LogOut, Save, Mail, Package, CheckCircle, Shield, Phone, MapPin, Camera, MessageSquare } from 'lucide-react';
 import AvatarUpload from '@/components/AvatarUpload';
@@ -12,6 +13,7 @@ import { findCountryByIso } from '@/lib/countries';
 export default function Cabinet() {
   const { lang, t } = useLanguage();
   const { user, isAuthenticated, logout, checkUserAuth } = useAuth();
+  const unreadCount = useUnreadMessages();
   const [profile, setProfile] = useState({ address: '', avatar: '' });
   const [orders, setOrders] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -118,6 +120,11 @@ export default function Cabinet() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${cabinetTab === 'messages' ? 'bg-[#E61D25] text-white' : 'bg-white dark:bg-[#111111] text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 border border-[#0A0A0A]/5 dark:border-[#F9F9F9]/5'}`}
           >
             <MessageSquare className="w-4 h-4" /> {lang === 'ru' ? 'Сообщения' : 'Паёмҳо'}
+            {unreadCount > 0 && (
+              <span className="ml-1 min-w-[18px] h-[18px] px-1 bg-[#E61D25] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
           </button>
         </div>
 

@@ -6,6 +6,7 @@ import { useTheme } from '@/lib/theme.jsx';
 import { useAuth } from '@/lib/AuthContext';
 import { useCart } from '@/lib/CartContext.jsx';
 import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
+import { useUnreadMessages } from '@/lib/useUnreadMessages';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
@@ -14,6 +15,7 @@ export default function Navbar() {
   const { user, isAuthenticated } = useAuth();
   const { count: cartCount } = useCart();
   const { settings } = useSiteSettings();
+  const unreadCount = useUnreadMessages();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const menuRef = useRef(null);
@@ -112,7 +114,14 @@ export default function Navbar() {
               onClick={() => setMenuOpen(!menuOpen)}
               className="flex items-center gap-2 p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all"
             >
-              <UserAvatar />
+              <div className="relative">
+                <UserAvatar />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#E61D25] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-[#0A0A0A]">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </div>
               <div className="hidden sm:flex flex-col items-start leading-tight">
                 <span className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{isAuthenticated ? (user?.full_name || user?.email) : (lang === 'ru' ? 'Меню' : 'Меню')}</span>
                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${badge.color}`}>{badge.text}</span>

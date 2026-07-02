@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Plus, Pencil, Trash2, Package, FolderOpen, Inbox, X, Upload, Image, ShoppingCart, ShieldAlert, Settings, BarChart3, Users, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/AuthContext';
+import { useUnreadMessages } from '@/lib/useUnreadMessages';
 import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
 import ProductForm from '@/components/admin/ProductForm';
 import CategoryManager from '@/components/admin/CategoryManager';
@@ -29,6 +30,7 @@ const tabs = [
 export default function Admin() {
   const { lang } = useLanguage();
   const { user, isAuthenticated } = useAuth();
+  const unreadCount = useUnreadMessages();
   const [activeTab, setActiveTab] = useState('listings');
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -101,12 +103,17 @@ export default function Admin() {
                 onClick={() => setActiveTab(tab.key)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                   activeTab === tab.key
-                    ? 'bg-[#E61D25] text-white'
-                    : 'bg-white dark:bg-[#111111] text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 border border-[#0A0A0A]/5 dark:border-[#F9F9F9]/5'
+                    ? 'bg-[#0A0A0A]/10 dark:bg-white/10 text-[#0A0A0A] dark:text-[#F9F9F9] font-semibold'
+                    : 'bg-black/[0.03] dark:bg-white/[0.03] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:bg-black/[0.06] dark:hover:bg-white/[0.06]'
                 }`}
               >
                 <Icon className="w-4 h-4" />
                 {tab.label[lang] || tab.label.ru}
+                {tab.key === 'messages' && unreadCount > 0 && (
+                  <span className="ml-1 min-w-[18px] h-[18px] px-1 bg-[#E61D25] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </button>
             );
           })}
