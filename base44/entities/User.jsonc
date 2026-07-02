@@ -12,11 +12,32 @@
     },
     "phone": {
       "type": "string",
-      "description": "User phone number for orders"
+      "description": "User phone number"
+    },
+    "country_code": {
+      "type": "string",
+      "description": "Phone country code (e.g. +7, +992)"
+    },
+    "country_iso": {
+      "type": "string",
+      "description": "Phone country ISO code (e.g. RU, TJ)"
+    },
+    "phone_verified": {
+      "type": "boolean",
+      "description": "Whether phone is verified",
+      "default": false
+    },
+    "phone_verification_code": {
+      "type": "string",
+      "description": "Temporary SMS verification code"
     },
     "address": {
       "type": "string",
-      "description": "User delivery address for orders"
+      "description": "User delivery address"
+    },
+    "avatar": {
+      "type": "string",
+      "description": "User avatar image URL"
     }
   },
   "required": [

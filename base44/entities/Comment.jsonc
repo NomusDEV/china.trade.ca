@@ -1,0 +1,47 @@
+{
+  "name": "Comment",
+  "type": "object",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "description": "Product ID this comment belongs to"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Comment author user ID"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Comment author display name"
+    },
+    "user_avatar": {
+      "type": "string",
+      "description": "Comment author avatar URL"
+    },
+    "text": {
+      "type": "string",
+      "description": "Comment text"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Star rating 1-5 (only for top-level reviews, 0 for comments/replies)"
+    },
+    "parent_id": {
+      "type": "string",
+      "description": "Parent comment ID for replies (empty for top-level)"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "review",
+        "comment",
+        "reply"
+      ],
+      "default": "comment"
+    }
+  },
+  "required": [
+    "product_id",
+    "text"
+  ]
+}

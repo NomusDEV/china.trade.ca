@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, MessageCircle, Package, ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus } from 'lucide-react';
 import { useCart } from '@/lib/CartContext.jsx';
 import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
+import ProductComments from '@/components/product/ProductComments';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -199,6 +200,9 @@ export default function ProductDetail() {
             </div>
           </motion.div>
         </div>
+
+        {/* Comments & Reviews */}
+        <ProductComments productId={product.id} />
       </div>
     </div>
   );
