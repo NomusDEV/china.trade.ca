@@ -10,7 +10,7 @@ import { findCountryByIso } from '@/lib/countries';
 
 export default function Cabinet() {
   const { lang, t } = useLanguage();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, checkUserAuth } = useAuth();
   const [profile, setProfile] = useState({ address: '', avatar: '' });
   const [orders, setOrders] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -42,6 +42,7 @@ export default function Cabinet() {
     setSaving(true);
     try {
       await base44.auth.updateMe({ address: profile.address, avatar: profile.avatar });
+      await checkUserAuth();
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } finally {
@@ -64,7 +65,7 @@ export default function Cabinet() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A] flex items-center">
+      <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A] flex items-center">
         <div className="max-w-md mx-auto px-4 text-center w-full">
           <User className="w-16 h-16 mx-auto text-[#E61D25]/30 mb-4" />
           <h1 className="text-xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9] mb-2">
@@ -85,7 +86,7 @@ export default function Cabinet() {
   const country = user?.country_iso ? findCountryByIso(user.country_iso) : null;
 
   return (
-    <div className="min-h-screen pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
+    <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 pt-4">
           <h1 className="text-2xl lg:text-3xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9]">

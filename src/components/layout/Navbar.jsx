@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sun, Moon, ShoppingCart, User, Package, LogIn, Home as HomeIcon, LayoutGrid, Wrench, Info, Phone } from 'lucide-react';
+import { Sun, Moon, ShoppingCart, User, Package, LogIn, Home as HomeIcon, LayoutGrid, Wrench, Info, Phone } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { useTheme } from '@/lib/theme.jsx';
 import { useAuth } from '@/lib/AuthContext';
@@ -117,7 +117,7 @@ export default function Navbar() {
                 <span className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{isAuthenticated ? (user?.full_name || user?.email) : (lang === 'ru' ? 'Меню' : 'Меню')}</span>
                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${badge.color}`}>{badge.text}</span>
               </div>
-              <Menu className="w-4 h-4 text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40" />
+
             </button>
 
             <AnimatePresence>

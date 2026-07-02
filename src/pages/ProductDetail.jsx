@@ -27,7 +27,7 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F9F9F9] dark:bg-[#0A0A0A]">
+      <div className="flex-1 flex items-center justify-center bg-[#F9F9F9] dark:bg-[#0A0A0A]">
         <div className="w-8 h-8 border-4 border-[#E61D25]/20 border-t-[#E61D25] rounded-full animate-spin" />
       </div>
     );
@@ -35,7 +35,7 @@ export default function ProductDetail() {
 
   if (!product) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9F9F9] dark:bg-[#0A0A0A]">
+      <div className="flex-1 flex flex-col items-center justify-center bg-[#F9F9F9] dark:bg-[#0A0A0A]">
         <Package className="w-16 h-16 text-[#0A0A0A]/20 dark:text-[#F9F9F9]/20 mb-4" />
         <p className="text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 mb-4">Product not found</p>
         <Link to="/catalog" className="text-[#E61D25] text-sm">{t('product.back')}</Link>
@@ -53,7 +53,7 @@ export default function ProductDetail() {
   const whatsappHref = whatsappLink !== '#' ? `${whatsappLink}?text=${whatsappMsg}` : '#';
 
   return (
-    <div className="min-h-screen pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
+    <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link to="/catalog" className="inline-flex items-center gap-2 text-sm text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 hover:text-[#E61D25] transition-colors mb-8">
           <ArrowLeft className="w-4 h-4" /> {t('product.back')}

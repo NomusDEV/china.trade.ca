@@ -69,7 +69,7 @@ export default function Cart() {
 
   if (success) {
     return (
-      <div className="min-h-screen pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A] flex items-center">
+      <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A] flex items-center">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
           <motion.div
             initial={{ scale: 0 }}
@@ -101,7 +101,7 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A] flex items-center">
+      <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A] flex items-center">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
           <ShoppingCart className="w-16 h-16 mx-auto text-[#0A0A0A]/20 dark:text-[#F9F9F9]/20 mb-4" />
           <h1 className="text-xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9] mb-2">{t('cart.empty')}</h1>
@@ -115,7 +115,7 @@ export default function Cart() {
   }
 
   return (
-    <div className="min-h-screen pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
+    <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link to="/catalog" className="inline-flex items-center gap-2 text-sm text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 hover:text-[#E61D25] transition-colors mb-6">
           <ArrowLeft className="w-4 h-4" /> {t('cart.continueShopping')}
