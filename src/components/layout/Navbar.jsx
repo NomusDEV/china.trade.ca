@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sun, Moon, ShoppingCart, User, ChevronDown, LogOut, Package } from 'lucide-react';
+import { Menu, X, Sun, Moon, ShoppingCart, User, Package, LogIn, Home as HomeIcon, LayoutGrid, Wrench, Info, Phone } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { useTheme } from '@/lib/theme.jsx';
 import { useAuth } from '@/lib/AuthContext';
@@ -11,13 +11,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Navbar() {
   const { lang, setLang, t } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { count: cartCount } = useCart();
   const { settings } = useSiteSettings();
-  const [isOpen, setIsOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const userMenuRef = useRef(null);
+  const menuRef = useRef(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -27,14 +26,13 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    setIsOpen(false);
-    setUserMenuOpen(false);
+    setMenuOpen(false);
   }, [location]);
 
   useEffect(() => {
     const handleClick = (e) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
-        setUserMenuOpen(false);
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -42,12 +40,19 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { path: '/', label: t('nav.home') },
-    { path: '/catalog', label: t('nav.catalog') },
-    { path: '/services', label: t('nav.services') },
-    { path: '/about', label: t('nav.about') },
-    { path: '/contacts', label: t('nav.contacts') },
+    { path: '/', label: t('nav.home'), icon: HomeIcon },
+    { path: '/catalog', label: t('nav.catalog'), icon: LayoutGrid },
+    { path: '/services', label: t('nav.services'), icon: Wrench },
+    { path: '/about', label: t('nav.about'), icon: Info },
+    { path: '/contacts', label: t('nav.contacts'), icon: Phone },
   ];
+
+  const statusBadge = () => {
+    if (!isAuthenticated) return { text: lang === 'ru' ? 'Гость' : 'Меҳмон', color: 'bg-black/10 dark:bg-white/10 text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50' };
+    if (user?.role === 'admin') return { text: 'Админ', color: 'bg-[#C5A059]/15 text-[#C5A059]' };
+    return { text: lang === 'ru' ? 'Клиент' : 'Муштарӣ', color: 'bg-[#E61D25]/10 text-[#E61D25]' };
+  };
+  const badge = statusBadge();
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
@@ -57,32 +62,100 @@ export default function Navbar() {
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-18">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 bg-gradient-to-br from-[#E61D25] to-[#C5A059] rounded-xl flex items-center justify-center shadow-md shadow-[#E61D25]/20 group-hover:scale-105 transition-transform">
-              <span className="text-white font-bold text-sm">CT</span>
-            </div>
-            <span className="font-bold text-sm lg:text-base text-[#0A0A0A] dark:text-[#F9F9F9] tracking-tight hidden sm:block">{settings.company_name}</span>
-          </Link>
+          {/* Left: User/Menu button */}
+          <div ref={menuRef} className="relative">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center gap-2 p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+            >
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+                isAuthenticated
+                  ? 'bg-gradient-to-br from-[#E61D25] to-[#C5A059] text-white'
+                  : 'bg-black/8 dark:bg-white/10 text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50'
+              }`}>
+                <User className="w-[18px] h-[18px]" />
+              </div>
+              <div className="hidden sm:flex flex-col items-start leading-tight">
+                <span className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{isAuthenticated ? (user?.full_name || user?.email) : (lang === 'ru' ? 'Меню' : 'Меню')}</span>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${badge.color}`}>{badge.text}</span>
+              </div>
+              <Menu className="w-4 h-4 text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40" />
+            </button>
 
-          {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 ${
-                  location.pathname === link.path
-                    ? 'text-[#E61D25] bg-[#E61D25]/8'
-                    : 'text-[#0A0A0A]/65 dark:text-[#F9F9F9]/65 hover:text-[#0A0A0A] dark:hover:text-[#F9F9F9] hover:bg-black/5 dark:hover:bg-white/5'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            <AnimatePresence>
+              {menuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute left-0 top-full mt-2 w-64 rounded-2xl bg-white dark:bg-[#111111] shadow-2xl shadow-black/10 dark:shadow-black/50 border border-black/5 dark:border-white/5 overflow-hidden"
+                >
+                  {/* Status header */}
+                  <div className="p-4 border-b border-black/5 dark:border-white/5">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('cabinet.welcome')}</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${badge.color}`}>{badge.text}</span>
+                    </div>
+                    <p className="text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] truncate">
+                      {isAuthenticated ? (user?.full_name || user?.email) : (lang === 'ru' ? 'Не авторизован' : 'Ворид нашуда')}
+                    </p>
+                  </div>
+
+                  {/* Nav links */}
+                  <div className="p-2">
+                    {navLinks.map((link) => {
+                      const Icon = link.icon;
+                      return (
+                        <Link
+                          key={link.path}
+                          to={link.path}
+                          className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                            location.pathname === link.path
+                              ? 'bg-[#E61D25]/8 text-[#E61D25]'
+                              : 'text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:bg-black/5 dark:hover:bg-white/5'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" /> {link.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+
+                  {/* Cabinet / Login */}
+                  <div className="p-2 border-t border-black/5 dark:border-white/5">
+                    {isAuthenticated ? (
+                      <Link
+                        to="/cabinet"
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                      >
+                        <User className="w-4 h-4" /> {t('cabinet.title')}
+                      </Link>
+                    ) : (
+                      <a href="/login" className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-[#E61D25] hover:bg-[#E61D25]/8 transition-all">
+                        <LogIn className="w-4 h-4" /> {t('auth.login')}
+                      </a>
+                    )}
+                    {isAuthenticated && user?.role === 'admin' && (
+                      <Link
+                        to="/admin"
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-[#C5A059] hover:bg-[#C5A059]/10 transition-all"
+                      >
+                        <Package className="w-4 h-4" /> {t('nav.admin')}
+                      </Link>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Controls */}
+          {/* Center: Company name */}
+          <Link to="/" className="font-bold text-sm lg:text-base text-[#0A0A0A] dark:text-[#F9F9F9] tracking-tight">
+            {settings.company_name}
+          </Link>
+
+          {/* Right controls */}
           <div className="flex items-center gap-1">
             <Link
               to="/cart"
@@ -95,138 +168,21 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-
             <button
               onClick={() => setLang(lang === 'ru' ? 'tj' : 'ru')}
               className="p-2 rounded-lg text-[#0A0A0A]/65 dark:text-[#F9F9F9]/65 hover:text-[#C5A059] hover:bg-black/5 dark:hover:bg-white/5 transition-all text-xs font-bold"
             >
               {lang === 'ru' ? 'TJ' : 'RU'}
             </button>
-
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg text-[#0A0A0A]/65 dark:text-[#F9F9F9]/65 hover:text-[#C5A059] hover:bg-black/5 dark:hover:bg-white/5 transition-all"
             >
               {isDark ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
             </button>
-
-            {/* User Menu */}
-            <div ref={userMenuRef} className="relative">
-              <button
-                onClick={() => (isAuthenticated ? setUserMenuOpen(!userMenuOpen) : (window.location.href = '/login'))}
-                className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all"
-              >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
-                  isAuthenticated
-                    ? 'bg-gradient-to-br from-[#E61D25] to-[#C5A059] text-white'
-                    : 'bg-black/8 dark:bg-white/10 text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50'
-                }`}>
-                  <User className="w-4 h-4" />
-                </div>
-                {isAuthenticated && (
-                  <ChevronDown className={`w-3.5 h-3.5 text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
-                )}
-              </button>
-
-              <AnimatePresence>
-                {userMenuOpen && isAuthenticated && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-white dark:bg-[#111111] shadow-2xl shadow-black/10 dark:shadow-black/50 border border-black/5 dark:border-white/5 overflow-hidden"
-                  >
-                    <div className="p-4 border-b border-black/5 dark:border-white/5">
-                      <p className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50">{t('cabinet.welcome')}</p>
-                      <p className="text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] truncate">{user?.full_name || user?.email}</p>
-                    </div>
-                    <div className="p-2">
-                      <Link
-                        to="/cabinet"
-                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
-                      >
-                        <User className="w-4 h-4" /> {t('cabinet.title')}
-                      </Link>
-                      {user?.role === 'admin' && (
-                        <Link
-                          to="/admin"
-                          className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-[#C5A059] hover:bg-[#C5A059]/10 transition-all"
-                        >
-                          <Package className="w-4 h-4" /> {t('nav.admin')}
-                        </Link>
-                      )}
-                      <button
-                        onClick={logout}
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-500/10 transition-all"
-                      >
-                        <LogOut className="w-4 h-4" /> {t('cabinet.logout')}
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden p-2 rounded-lg text-[#0A0A0A]/65 dark:text-[#F9F9F9]/65"
-            >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
           </div>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-2xl border-t border-black/5 dark:border-white/5 overflow-hidden"
-          >
-            <div className="px-4 py-4 space-y-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`block px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                    location.pathname === link.path
-                      ? 'text-[#E61D25] bg-[#E61D25]/8'
-                      : 'text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <Link to="/cart" className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70">
-                <ShoppingCart className="w-4 h-4" /> {t('cart.title')} {cartCount > 0 && `(${cartCount})`}
-              </Link>
-              {isAuthenticated ? (
-                <>
-                  <Link to="/cabinet" className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70">
-                    <User className="w-4 h-4" /> {t('cabinet.title')}
-                  </Link>
-                  {user?.role === 'admin' && (
-                    <Link to="/admin" className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-[#C5A059]">
-                      <Package className="w-4 h-4" /> {t('nav.admin')}
-                    </Link>
-                  )}
-                  <button onClick={logout} className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-red-500 w-full">
-                    <LogOut className="w-4 h-4" /> {t('cabinet.logout')}
-                  </button>
-                </>
-              ) : (
-                <Link to="/login" className="block px-4 py-3 rounded-lg text-sm font-medium text-[#E61D25]">
-                  {t('auth.login')}
-                </Link>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </nav>
   );
 }
