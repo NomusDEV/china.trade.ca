@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Package, FolderOpen, Inbox, X, Upload, Image, ShoppingCart, ShieldAlert, Settings } from 'lucide-react';
+import { Plus, Pencil, Trash2, Package, FolderOpen, Inbox, X, Upload, Image, ShoppingCart, ShieldAlert, Settings, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/AuthContext';
 import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
@@ -11,8 +11,10 @@ import CategoryManager from '@/components/admin/CategoryManager';
 import InquiryManager from '@/components/admin/InquiryManager';
 import OrderManager from '@/components/admin/OrderManager';
 import SiteSettingsManager from '@/components/admin/SiteSettingsManager';
+import MyListingsDashboard from '@/components/admin/MyListingsDashboard';
 
 const tabs = [
+  { key: 'listings', icon: BarChart3, label: { ru: 'Мои объявления', tj: 'Эълонҳои ман' } },
   { key: 'products', icon: Package, label: { ru: 'Товары', tj: 'Молҳо' } },
   { key: 'categories', icon: FolderOpen, label: { ru: 'Категории', tj: 'Категорияҳо' } },
   { key: 'orders', icon: ShoppingCart, label: { ru: 'Заказы', tj: 'Фармоишҳо' } },
@@ -23,7 +25,7 @@ const tabs = [
 export default function Admin() {
   const { lang } = useLanguage();
   const { user, isAuthenticated } = useAuth();
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('listings');
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [inquiries, setInquiries] = useState([]);
@@ -169,6 +171,7 @@ export default function Admin() {
               </div>
             )}
 
+            {activeTab === 'listings' && <MyListingsDashboard products={products} orders={orders} inquiries={inquiries} categories={categories} />}
             {activeTab === 'categories' && <CategoryManager categories={categories} onUpdate={loadData} />}
             {activeTab === 'orders' && <OrderManager orders={orders} onUpdate={loadData} />}
             {activeTab === 'inquiries' && <InquiryManager inquiries={inquiries} onUpdate={loadData} />}

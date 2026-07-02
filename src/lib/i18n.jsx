@@ -220,6 +220,18 @@ const translations = {
       listView: 'Список',
       results: 'Найдено',
     },
+    listings: {
+      totalProducts: 'Всего товаров',
+      catalogValue: 'Стоимость каталога',
+      totalOrders: 'Всего заказов',
+      revenue: 'Выручка',
+      avgPrice: 'Средняя цена',
+      unitsOrdered: 'Заказано единиц',
+      ordersByStatus: 'Заказы по статусам',
+      byCategory: 'Товары по категориям',
+      recentOrders: 'Последние заказы',
+      inquiries: 'Заявки',
+    },
   },
   tj: {
     nav: {
@@ -439,6 +451,18 @@ const translations = {
       gridView: 'Шабака',
       listView: 'Рӯйхат',
       results: 'Ёфт шуд',
+    },
+    listings: {
+      totalProducts: 'Ҳамагӣ молҳо',
+      catalogValue: 'Арзиши каталог',
+      totalOrders: 'Ҳамагӣ фармоишҳо',
+      revenue: 'Даромад',
+      avgPrice: 'Нархи миёна',
+      unitsOrdered: 'Фармоиш дода шуд',
+      ordersByStatus: 'Фармоишҳо аз рӯи статус',
+      byCategory: 'Молҳо аз рӯи категория',
+      recentOrders: 'Фармоишҳои охирин',
+      inquiries: 'Дархостҳо',
     },
   },
 };
