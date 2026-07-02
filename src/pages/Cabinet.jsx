@@ -135,57 +135,9 @@ export default function Cabinet() {
           </div>
         )}
 
-        {/* Info left, Profile right */}
-        {cabinetTab !== 'messages' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* LEFT: Orders & Account Info */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Account Info */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C5A059]/10 to-[#E61D25]/10 flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-[#C5A059]" />
-                </div>
-                <h3 className="font-semibold text-[#0A0A0A] dark:text-[#F9F9F9]">{t('cabinet.accountInfo')}</h3>
-                <span className={`ml-auto text-xs font-bold px-2.5 py-1 rounded-md ${roleBadge.color}`}>{roleBadge.text}</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-black/[0.03] dark:bg-white/[0.03]">
-                  <User className="w-4 h-4 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('cabinet.fullName')}</p>
-                    <p className="text-sm text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 truncate">{user?.full_name || '—'}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-black/[0.03] dark:bg-white/[0.03]">
-                  <Mail className="w-4 h-4 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('cabinet.email')}</p>
-                    <p className="text-sm text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 truncate">{user?.email || '—'}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-black/[0.03] dark:bg-white/[0.03]">
-                  <Phone className="w-4 h-4 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('cabinet.phone')}</p>
-                    <p className="text-sm text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 truncate">
-                      {country && <span>{country.flag} {country.dial} </span>}
-                      {user?.phone || '—'}
-                      {user?.phone_verified && <CheckCircle className="inline w-3 h-3 text-green-500 ml-1" />}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-black/[0.03] dark:bg-white/[0.03]">
-                  <MapPin className="w-4 h-4 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('cabinet.address')}</p>
-                    <p className="text-sm text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 truncate">{user?.address || '—'}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Order History */}
+        {/* Orders tab — standalone */}
+        {cabinetTab === 'orders' && (
+          <div className="max-w-4xl mx-auto">
             <div className="p-6 rounded-2xl bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C5A059]/10 to-[#E61D25]/10 flex items-center justify-center">
@@ -193,7 +145,6 @@ export default function Cabinet() {
                 </div>
                 <h3 className="font-semibold text-[#0A0A0A] dark:text-[#F9F9F9]">{t('cabinet.orderHistory')}</h3>
               </div>
-
               {loading ? (
                 <div className="flex justify-center py-12">
                   <div className="w-8 h-8 border-4 border-[#E61D25]/20 border-t-[#E61D25] rounded-full animate-spin" />
@@ -243,6 +194,59 @@ export default function Cabinet() {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Profile tab — Account Info + Profile form */}
+        {cabinetTab === 'profile' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* LEFT: Account Info only */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Account Info */}
+            <div className="p-6 rounded-2xl bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C5A059]/10 to-[#E61D25]/10 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-[#C5A059]" />
+                </div>
+                <h3 className="font-semibold text-[#0A0A0A] dark:text-[#F9F9F9]">{t('cabinet.accountInfo')}</h3>
+                <span className={`ml-auto text-xs font-bold px-2.5 py-1 rounded-md ${roleBadge.color}`}>{roleBadge.text}</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-black/[0.03] dark:bg-white/[0.03]">
+                  <User className="w-4 h-4 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('cabinet.fullName')}</p>
+                    <p className="text-sm text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 truncate">{user?.full_name || '—'}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-black/[0.03] dark:bg-white/[0.03]">
+                  <Mail className="w-4 h-4 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('cabinet.email')}</p>
+                    <p className="text-sm text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 truncate">{user?.email || '—'}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-black/[0.03] dark:bg-white/[0.03]">
+                  <Phone className="w-4 h-4 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('cabinet.phone')}</p>
+                    <p className="text-sm text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 truncate">
+                      {country && <span>{country.flag} {country.dial} </span>}
+                      {user?.phone || '—'}
+                      {user?.phone_verified && <CheckCircle className="inline w-3 h-3 text-green-500 ml-1" />}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-black/[0.03] dark:bg-white/[0.03]">
+                  <MapPin className="w-4 h-4 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('cabinet.address')}</p>
+                    <p className="text-sm text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 truncate">{user?.address || '—'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           {/* RIGHT: Profile + Phone Verification + Logout */}

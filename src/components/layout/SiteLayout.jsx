@@ -3,8 +3,10 @@ import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import TelegramButton from './TelegramButton';
+import { usePresence } from '@/lib/usePresence';
 
 export default function SiteLayout() {
+  usePresence(); // Global presence tracking — updates last_seen every 15s
   return (
     <div className="min-h-screen flex flex-col bg-[#F9F9F9] dark:bg-[#0A0A0A] transition-colors duration-500">
       <Navbar />

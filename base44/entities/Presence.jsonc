@@ -1,0 +1,42 @@
+{
+  "name": "Presence",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "User ID this presence record belongs to"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Display name of the user"
+    },
+    "user_avatar": {
+      "type": "string",
+      "description": "Avatar URL of the user"
+    },
+    "user_role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user"
+      ],
+      "description": "Role of the user"
+    },
+    "last_seen": {
+      "type": "string",
+      "description": "ISO timestamp of last activity"
+    },
+    "is_typing": {
+      "type": "boolean",
+      "description": "Whether the user is currently typing",
+      "default": false
+    },
+    "typing_thread_id": {
+      "type": "string",
+      "description": "Thread ID where the user is currently typing"
+    }
+  },
+  "required": [
+    "user_id"
+  ]
+}
