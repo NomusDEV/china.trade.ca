@@ -1,0 +1,45 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "thread_user_id": {
+      "type": "string",
+      "description": "Client user ID \u2014 identifies the conversation thread"
+    },
+    "sender_id": {
+      "type": "string",
+      "description": "User ID of the message sender"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Display name of sender"
+    },
+    "sender_avatar": {
+      "type": "string",
+      "description": "Avatar URL of sender"
+    },
+    "sender_role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user"
+      ],
+      "default": "user"
+    },
+    "text": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "read": {
+      "type": "boolean",
+      "description": "Whether the recipient has read this message",
+      "default": false
+    }
+  },
+  "required": [
+    "thread_user_id",
+    "sender_id",
+    "sender_role",
+    "text"
+  ]
+}

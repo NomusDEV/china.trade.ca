@@ -3,9 +3,10 @@ import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { useAuth } from '@/lib/AuthContext';
 import { motion } from 'framer-motion';
-import { User, ShoppingBag, LogOut, Save, Mail, Package, CheckCircle, Shield, Phone, MapPin, Camera } from 'lucide-react';
+import { User, ShoppingBag, LogOut, Save, Mail, Package, CheckCircle, Shield, Phone, MapPin, Camera, MessageSquare } from 'lucide-react';
 import AvatarUpload from '@/components/AvatarUpload';
 import PhoneVerification from '@/components/PhoneVerification';
+import ClientMessages from '@/components/cabinet/ClientMessages';
 import { findCountryByIso } from '@/lib/countries';
 
 export default function Cabinet() {
@@ -16,6 +17,7 @@ export default function Cabinet() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [cabinetTab, setCabinetTab] = useState('profile');
 
   useEffect(() => {
     if (user) {
@@ -97,7 +99,37 @@ export default function Cabinet() {
           </p>
         </motion.div>
 
+        {/* Cabinet tabs */}
+        <div className="flex gap-2 mb-8 overflow-x-auto">
+          <button
+            onClick={() => setCabinetTab('profile')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${cabinetTab === 'profile' ? 'bg-[#E61D25] text-white' : 'bg-white dark:bg-[#111111] text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 border border-[#0A0A0A]/5 dark:border-[#F9F9F9]/5'}`}
+          >
+            <User className="w-4 h-4" /> {t('cabinet.profile')}
+          </button>
+          <button
+            onClick={() => setCabinetTab('orders')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${cabinetTab === 'orders' ? 'bg-[#E61D25] text-white' : 'bg-white dark:bg-[#111111] text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 border border-[#0A0A0A]/5 dark:border-[#F9F9F9]/5'}`}
+          >
+            <ShoppingBag className="w-4 h-4" /> {t('cabinet.orderHistory')}
+          </button>
+          <button
+            onClick={() => setCabinetTab('messages')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${cabinetTab === 'messages' ? 'bg-[#E61D25] text-white' : 'bg-white dark:bg-[#111111] text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 border border-[#0A0A0A]/5 dark:border-[#F9F9F9]/5'}`}
+          >
+            <MessageSquare className="w-4 h-4" /> {lang === 'ru' ? 'Сообщения' : 'Паёмҳо'}
+          </button>
+        </div>
+
+        {/* Messages tab */}
+        {cabinetTab === 'messages' && (
+          <div className="max-w-3xl mx-auto">
+            <ClientMessages />
+          </div>
+        )}
+
         {/* Info left, Profile right */}
+        {cabinetTab !== 'messages' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* LEFT: Orders & Account Info */}
           <div className="lg:col-span-2 space-y-6">
@@ -290,6 +322,7 @@ export default function Cabinet() {
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );
