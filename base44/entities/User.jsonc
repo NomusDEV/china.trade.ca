@@ -1,4 +1,6 @@
 {
+  "name": "User",
+  "type": "object",
   "properties": {
     "role": {
       "type": "string",
@@ -7,11 +9,17 @@
         "admin",
         "user"
       ]
+    },
+    "phone": {
+      "type": "string",
+      "description": "User phone number for orders"
+    },
+    "address": {
+      "type": "string",
+      "description": "User delivery address for orders"
     }
   },
   "required": [
     "role"
-  ],
-  "name": "User",
-  "type": "object"
+  ]
 }
