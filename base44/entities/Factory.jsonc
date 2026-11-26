@@ -42,6 +42,54 @@
       "type": "string",
       "description": "City of the factory"
     },
+    "address": {
+      "type": "string",
+      "description": "Full address of the factory"
+    },
+    "founded_year": {
+      "type": "number",
+      "description": "Year the factory was founded"
+    },
+    "employees": {
+      "type": "string",
+      "description": "Number of employees, e.g. 200-500"
+    },
+    "main_products_ru": {
+      "type": "string",
+      "description": "Main product range in Russian"
+    },
+    "main_products_tj": {
+      "type": "string",
+      "description": "Main product range in Tajik"
+    },
+    "capacity_ru": {
+      "type": "string",
+      "description": "Production capacity in Russian"
+    },
+    "capacity_tj": {
+      "type": "string",
+      "description": "Production capacity in Tajik"
+    },
+    "min_order": {
+      "type": "string",
+      "description": "Minimum order size, e.g. 500 pcs"
+    },
+    "certifications": {
+      "type": "string",
+      "description": "Certifications and standards"
+    },
+    "working_hours": {
+      "type": "string",
+      "description": "Working hours"
+    },
+    "delivery_terms_ru": {
+      "type": "string",
+      "description": "Delivery terms in Russian"
+    },
+    "delivery_terms_tj": {
+      "type": "string",
+      "description": "Delivery terms in Tajik"
+    },
     "phone": {
       "type": "string",
       "description": "Contact phone number"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/i18n.jsx';
@@ -8,7 +8,7 @@ import { Factory, Search, Package, ClipboardCheck, Truck, ArrowRight, Store, Loc
 import { PRODUCT_TYPES, getTypeLabel } from '@/lib/productTypes';
 import { telegramHref, whatsappHref } from '@/lib/factoryLinks';
 import FactoryCard from '@/components/shop/FactoryCard';
-import FactoryDetail from '@/components/shop/FactoryDetail';
+import BackButton from '@/components/layout/BackButton';
 
 function ContactLine({ Icon, label, value, href }) {
   const content = (
@@ -30,13 +30,13 @@ function ContactLine({ Icon, label, value, href }) {
 export default function Shop() {
   const { lang } = useLanguage();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [factories, setFactories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
-  const [detail, setDetail] = useState(null);
   const directoryRef = useRef(null);
   const panelRef = useRef(null);
 
@@ -74,6 +74,15 @@ export default function Shop() {
   const selectedFactories = factories.filter((f) => selectedIds.includes(f.id));
 
   const services = [
+    {
+      key: 'search',
+      Icon: Search,
+      title_ru: 'Найти товары',
+      title_tj: 'Ёфтани молҳо',
+      desc_ru: 'Поиск товаров в каталоге по типу, цене и количеству.',
+      desc_tj: 'Ҷустуҷӯи молҳо дар каталог аз рӯи навъ, нарх ва миқдор.',
+      to: '/catalog',
+    },
     {
       key: 'factories',
       Icon: Factory,
@@ -117,6 +126,8 @@ export default function Shop() {
   return (
     <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <BackButton to="/" />
+
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
           <div className="flex items-center gap-3 mb-3">
@@ -136,7 +147,7 @@ export default function Shop() {
         </motion.div>
 
         {/* Services */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           {services.map((service, i) => {
             const Icon = service.Icon;
             const title = lang === 'tj' ? service.title_tj : service.title_ru;
@@ -168,6 +179,15 @@ export default function Shop() {
               </motion.div>
             );
           })}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 mb-14">
+          <Link to="/services" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/10 text-sm font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:border-[#C5A059] transition-colors">
+            {lang === 'ru' ? 'Все услуги' : 'Ҳамаи хизматрасониҳо'} <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link to="/contacts" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/10 text-sm font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:border-[#C5A059] transition-colors">
+            {lang === 'ru' ? 'Связаться с нами' : 'Тамос бо мо'}
+          </Link>
         </div>
 
         {/* Factory directory */}
@@ -280,7 +300,7 @@ export default function Shop() {
                         lang={lang}
                         selected={selectedIds.includes(factory.id)}
                         onToggle={toggleFactory}
-                        onOpen={setDetail}
+                        onOpen={(f) => navigate(`/shop/factory/${f.id}`)}
                         locked={isLocked(factory)}
                       />
                     </motion.div>
@@ -370,15 +390,6 @@ export default function Shop() {
         </button>
       )}
 
-      <FactoryDetail
-        factory={detail}
-        open={!!detail}
-        onClose={() => setDetail(null)}
-        lang={lang}
-        locked={detail ? isLocked(detail) : false}
-        selected={detail ? selectedIds.includes(detail.id) : false}
-        onToggle={toggleFactory}
-      />
     </div>
   );
 }

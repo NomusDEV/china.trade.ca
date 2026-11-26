@@ -2,6 +2,7 @@ import React from 'react';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
 import { Search, ShieldCheck, Factory, ClipboardCheck, Warehouse, ShoppingCart, Truck, Lightbulb } from 'lucide-react';
+import BackButton from '@/components/layout/BackButton';
 
 const services = [
   { key: 'search', icon: Search },
@@ -20,6 +21,8 @@ export default function Services() {
   return (
     <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <BackButton to="/shop" />
+
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16 pt-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="h-px w-12 bg-[#C5A059]" />

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Search, ShieldCheck, Package, ShoppingCart, LayoutGrid, List, SlidersHorizontal, X, LayoutGrid as AllIcon } from 'lucide-react';
 import { useCart } from '@/lib/CartContext.jsx';
 import { PRODUCT_TYPES, getTypeLabel } from '@/lib/productTypes';
+import BackButton from '@/components/layout/BackButton';
 
 export default function Catalog() {
   const { lang, t } = useLanguage();
@@ -77,6 +78,8 @@ export default function Catalog() {
   return (
     <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <BackButton to="/" />
+
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="flex items-center gap-3 mb-3">

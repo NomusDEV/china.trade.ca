@@ -9,6 +9,9 @@ const emptyForm = {
   name_ru: '', name_tj: '', type: '', country: '', city: '',
   phone: '', telegram: '', whatsapp: '', wechat: '', website: '',
   description_ru: '', description_tj: '', status: 'active', requires_subscription: false, image: '',
+  address: '', founded_year: '', employees: '', min_order: '', certifications: '', working_hours: '',
+  main_products_ru: '', main_products_tj: '', capacity_ru: '', capacity_tj: '',
+  delivery_terms_ru: '', delivery_terms_tj: '',
 };
 
 export default function FactoryManager() {
@@ -55,6 +58,9 @@ export default function FactoryManager() {
     delete data.created_date;
     delete data.updated_date;
     delete data.created_by_id;
+    if (data.founded_year !== '' && data.founded_year !== undefined && data.founded_year !== null) {
+      data.founded_year = Number(data.founded_year);
+    }
     if (editing) {
       await base44.entities.Factory.update(editing.id, data);
     } else {
@@ -168,6 +174,36 @@ export default function FactoryManager() {
                 rows={3}
                 className="w-full px-4 py-3 rounded-xl border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 bg-[#F9F9F9] dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm resize-none focus:outline-none focus:border-[#C5A059]"
               />
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] mb-3">
+              {lang === 'ru' ? 'Дополнительная информация' : 'Маълумоти иловагӣ'}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {field('address', lang === 'ru' ? 'Адрес' : 'Суроға')}
+              <div>
+                <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2">
+                  {lang === 'ru' ? 'Год основания' : 'Соли таъсис'}
+                </label>
+                <input
+                  type="number"
+                  value={form.founded_year}
+                  onChange={(e) => setForm({ ...form, founded_year: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 bg-[#F9F9F9] dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]"
+                />
+              </div>
+              {field('employees', lang === 'ru' ? 'Сотрудники' : 'Кормандон')}
+              {field('min_order', lang === 'ru' ? 'Мин. партия' : 'Партияи ҳадди ақал')}
+              {field('certifications', lang === 'ru' ? 'Сертификаты' : 'Сертификатҳо')}
+              {field('working_hours', lang === 'ru' ? 'Время работы' : 'Вақти корӣ')}
+              {field('main_products_ru', lang === 'ru' ? 'Ассортимент (RU)' : 'Ассортимент (RU)')}
+              {field('main_products_tj', lang === 'ru' ? 'Ассортимент (TJ)' : 'Ассортимент (TJ)')}
+              {field('capacity_ru', lang === 'ru' ? 'Производство (RU)' : 'Истеҳсолот (RU)')}
+              {field('capacity_tj', lang === 'ru' ? 'Производство (TJ)' : 'Истеҳсолот (TJ)')}
+              {field('delivery_terms_ru', lang === 'ru' ? 'Условия доставки (RU)' : 'Шартҳои расонидан (RU)')}
+              {field('delivery_terms_tj', lang === 'ru' ? 'Условия доставки (TJ)' : 'Шартҳои расонидан (TJ)')}
             </div>
           </div>
 

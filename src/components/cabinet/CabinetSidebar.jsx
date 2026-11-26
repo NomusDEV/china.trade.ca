@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { User, ShoppingBag, MessageSquare, LogOut, CheckCircle } from 'lucide-react';
 
 export default function CabinetSidebar({ user, lang, t, activeTab, setActiveTab, unreadCount, ordersCount, roleBadge, onLogout }) {
+  const [confirmLogout, setConfirmLogout] = useState(false);
+
   const tabs = [
     { key: 'profile', label: t('cabinet.profile'), Icon: User },
     { key: 'orders', label: t('cabinet.orderHistory'), Icon: ShoppingBag, badge: ordersCount },
@@ -62,12 +64,34 @@ export default function CabinetSidebar({ user, lang, t, activeTab, setActiveTab,
       </nav>
 
       {/* Logout */}
-      <button
-        onClick={onLogout}
-        className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-2xl border border-red-500/20 text-red-500 text-sm font-semibold hover:bg-red-500/5 transition-colors"
-      >
-        <LogOut className="w-4 h-4" /> {t('cabinet.logout')}
-      </button>
+      {confirmLogout ? (
+        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4">
+          <p className="text-xs font-medium text-center text-[#0A0A0A] dark:text-[#F9F9F9] mb-3">
+            {lang === 'ru' ? 'Выйти из аккаунта?' : 'Аз аккаунт бароед?'}
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={onLogout}
+              className="flex-1 py-2 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-500/90 transition-colors"
+            >
+              {lang === 'ru' ? 'Да, выйти' : 'Бале, бароед'}
+            </button>
+            <button
+              onClick={() => setConfirmLogout(false)}
+              className="flex-1 py-2 rounded-lg border border-black/10 dark:border-white/10 text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 hover:border-[#C5A059] transition-colors"
+            >
+              {lang === 'ru' ? 'Отмена' : 'Бекор'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => setConfirmLogout(true)}
+          className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-2xl border border-red-500/20 text-red-500 text-sm font-semibold hover:bg-red-500/5 transition-colors"
+        >
+          <LogOut className="w-4 h-4" /> {t('cabinet.logout')}
+        </button>
+      )}
     </div>
   );
 }

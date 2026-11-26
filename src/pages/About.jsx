@@ -2,6 +2,7 @@ import React from 'react';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
 import { Award, Users, Globe, Eye } from 'lucide-react';
+import BackButton from '@/components/layout/BackButton';
 
 const ABOUT_IMG = 'https://media.base44.com/images/public/6a3a2398a475362c0d768df6/9cefe8582_generated_be6c034c.png';
 const QC_IMG = 'https://media.base44.com/images/public/6a3a2398a475362c0d768df6/4b7aab00c_generated_c2fd9f8c.png';
@@ -19,6 +20,8 @@ export default function About() {
   return (
     <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <BackButton to="/" />
+
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16 pt-8">
           <div className="flex items-center justify-center gap-3 mb-4">
