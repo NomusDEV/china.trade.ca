@@ -6,6 +6,10 @@
       "type": "string",
       "description": "Product ID this comment belongs to"
     },
+    "factory_id": {
+      "type": "string",
+      "description": "Factory ID this review belongs to"
+    },
     "user_id": {
       "type": "string",
       "description": "Comment author user ID"
@@ -41,7 +45,6 @@
     }
   },
   "required": [
-    "product_id",
     "text"
   ],
   "rls": {

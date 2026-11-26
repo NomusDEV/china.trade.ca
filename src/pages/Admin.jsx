@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Package, FolderOpen, Inbox, X, Upload, Image, ShoppingCart, ShieldAlert, Settings, BarChart3, Users, MessageSquare, Factory } from 'lucide-react';
+import { Plus, Pencil, Trash2, Package, FolderOpen, Inbox, X, Upload, Image, ShoppingCart, ShieldAlert, Settings, BarChart3, Users, MessageSquare, Factory, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/AuthContext';
 import { useUnreadMessages } from '@/lib/useUnreadMessages';
@@ -16,6 +16,8 @@ import MyListingsDashboard from '@/components/admin/MyListingsDashboard';
 import ClientManager from '@/components/admin/ClientManager';
 import MessageCenter from '@/components/admin/MessageCenter';
 import FactoryManager from '@/components/admin/FactoryManager';
+import AiGenerator from '@/components/admin/AiGenerator';
+import BackButton from '@/components/layout/BackButton';
 
 const tabs = [
   { key: 'listings', icon: BarChart3, label: { ru: 'Мои объявления', tj: 'Эълонҳои ман' } },
@@ -25,6 +27,7 @@ const tabs = [
   { key: 'factories', icon: Factory, label: { ru: 'Заводы', tj: 'Заводҳо' } },
   { key: 'categories', icon: FolderOpen, label: { ru: 'Категории', tj: 'Категорияҳо' } },
   { key: 'orders', icon: ShoppingCart, label: { ru: 'Заказы', tj: 'Фармоишҳо' } },
+  { key: 'ai', icon: Sparkles, label: { ru: 'AI генератор', tj: 'Генератори ИИ' } },
   { key: 'inquiries', icon: Inbox, label: { ru: 'Заявки', tj: 'Дархостҳо' } },
   { key: 'settings', icon: Settings, label: { ru: 'Настройки', tj: 'Танзимотҳо' } },
 ];
@@ -90,6 +93,7 @@ export default function Admin() {
   return (
     <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <BackButton to="/" />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 pt-4">
           <h1 className="text-2xl lg:text-3xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9]">
             {lang === 'ru' ? 'Панель администратора' : 'Панели идоракунӣ'}
@@ -197,6 +201,7 @@ export default function Admin() {
             {activeTab === 'categories' && <CategoryManager categories={categories} onUpdate={loadData} />}
             {activeTab === 'orders' && <OrderManager orders={orders} onUpdate={loadData} />}
             {activeTab === 'inquiries' && <InquiryManager inquiries={inquiries} onUpdate={loadData} />}
+            {activeTab === 'ai' && <AiGenerator onGenerated={loadData} />}
             {activeTab === 'settings' && <SiteSettingsManager />}
           </>
         )}

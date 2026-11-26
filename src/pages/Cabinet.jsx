@@ -10,6 +10,7 @@ import CabinetSidebar from '@/components/cabinet/CabinetSidebar';
 import ProfileTab from '@/components/cabinet/ProfileTab';
 import OrdersTab from '@/components/cabinet/OrdersTab';
 import { findCountryByIso } from '@/lib/countries';
+import BackButton from '@/components/layout/BackButton';
 
 export default function Cabinet() {
   const { lang, t } = useLanguage();
@@ -80,6 +81,7 @@ export default function Cabinet() {
   return (
     <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <BackButton to="/" />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 pt-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-px w-10 bg-[#C5A059]" />

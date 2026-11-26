@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
-import { MessageCircle, Mail, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import BackButton from '@/components/layout/BackButton';
+import ContactIcon from '@/components/ContactIcon';
 import { Button } from '@/components/ui/button';
 import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
 
@@ -28,10 +29,10 @@ export default function Contacts() {
   };
 
   const channels = [
-    settings.telegram && { name: 'Telegram', href: telegramLink, icon: MessageCircle, label: settings.telegram },
-    settings.whatsapp && { name: 'WhatsApp', href: whatsappLink, icon: MessageCircle, label: settings.whatsapp },
-    settings.wechat && { name: 'WeChat', href: '#', icon: MessageCircle, label: settings.wechat },
-    settings.email && { name: 'Email', href: emailLink, icon: Mail, label: settings.email },
+    settings.telegram && { name: 'Telegram', href: telegramLink, type: 'telegram', label: settings.telegram },
+    settings.whatsapp && { name: 'WhatsApp', href: whatsappLink, type: 'whatsapp', label: settings.whatsapp },
+    settings.wechat && { name: 'WeChat', href: '#', type: 'wechat', label: settings.wechat },
+    settings.email && { name: 'Email', href: emailLink, type: 'email', label: settings.email },
   ].filter(Boolean);
 
   return (
@@ -54,7 +55,6 @@ export default function Contacts() {
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {channels.map((ch, i) => {
-                const Icon = ch.icon;
                 return (
                   <motion.a
                     key={ch.name}
@@ -66,8 +66,8 @@ export default function Contacts() {
                     transition={{ delay: i * 0.1 }}
                     className="group p-6 rounded-2xl border border-[#0A0A0A]/5 dark:border-[#F9F9F9]/5 bg-white dark:bg-[#111111] hover:border-[#C5A059]/30 hover:shadow-xl transition-all duration-500"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#E61D25]/10 to-[#C5A059]/10 flex items-center justify-center mb-4">
-                      <Icon className="w-6 h-6 text-[#E61D25]" />
+                    <div className="mb-4">
+                      <ContactIcon type={ch.type} />
                     </div>
                     <h3 className="font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] mb-1">{ch.name}</h3>
                     {ch.label && <p className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50">{ch.label}</p>}

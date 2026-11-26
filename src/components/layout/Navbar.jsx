@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, ShoppingCart, User, Package, LogIn, Home as HomeIcon, LayoutGrid, Wrench, Info, Phone, Store } from 'lucide-react';
+import { Sun, Moon, ShoppingCart, User, Package, LogIn, Home as HomeIcon, Info, Phone, Store } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { useTheme } from '@/lib/theme.jsx';
 import { useAuth } from '@/lib/AuthContext';
@@ -41,9 +41,7 @@ export default function Navbar() {
 
   const navLinks = [
     { path: '/', label: t('nav.home'), icon: HomeIcon },
-    { path: '/catalog', label: t('nav.catalog'), icon: LayoutGrid },
     { path: '/shop', label: lang === 'ru' ? 'Магазин' : 'Мағоза', icon: Store },
-    { path: '/services', label: t('nav.services'), icon: Wrench },
     { path: '/about', label: t('nav.about'), icon: Info },
     { path: '/contacts', label: t('nav.contacts'), icon: Phone },
   ];

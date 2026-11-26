@@ -2,7 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
-import { MessageCircle, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import ContactIcon from '@/components/ContactIcon';
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -42,12 +43,12 @@ export default function Footer() {
             <div className="space-y-3">
               {settings.telegram && (
                 <a href={telegramLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-[#F9F9F9]/60 hover:text-[#F9F9F9] transition-colors">
-                  <MessageCircle className="w-4 h-4" /> Telegram
+                  <ContactIcon type="telegram" size="sm" /> Telegram
                 </a>
               )}
               {settings.whatsapp && (
                 <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-[#F9F9F9]/60 hover:text-[#F9F9F9] transition-colors">
-                  <MessageCircle className="w-4 h-4" /> WhatsApp
+                  <ContactIcon type="whatsapp" size="sm" /> WhatsApp
                 </a>
               )}
               {settings.email && (

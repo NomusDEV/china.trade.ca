@@ -5,7 +5,8 @@ import { useLanguage } from '@/lib/i18n.jsx';
 import { useCart } from '@/lib/CartContext.jsx';
 import { useAuth } from '@/lib/AuthContext';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, CheckCircle, Package, UserCheck } from 'lucide-react';
+import { ShoppingCart, Trash2, Plus, Minus, CheckCircle, Package, UserCheck } from 'lucide-react';
+import BackButton from '@/components/layout/BackButton';
 
 export default function Cart() {
   const { lang, t } = useLanguage();
@@ -118,9 +119,7 @@ export default function Cart() {
   return (
     <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link to="/catalog" className="inline-flex items-center gap-2 text-sm text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 hover:text-[#E61D25] transition-colors mb-6">
-          <ArrowLeft className="w-4 h-4" /> {t('cart.continueShopping')}
-        </Link>
+        <BackButton to="/catalog" />
         <h1 className="text-2xl lg:text-3xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9] mb-8">{t('cart.title')}</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

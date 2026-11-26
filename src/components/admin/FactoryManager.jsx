@@ -23,6 +23,8 @@ export default function FactoryManager() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [selected, setSelected] = useState([]);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -71,9 +73,15 @@ export default function FactoryManager() {
     load();
   };
 
-  const remove = async (id) => {
-    await base44.entities.Factory.delete(id);
+  const remove = async (ids) => {
+    await Promise.all(ids.map((id) => base44.entities.Factory.delete(id)));
+    setSelected([]);
+    setConfirmDelete(null);
     load();
+  };
+
+  const toggleSelected = (id) => {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const field = (key, label, props = {}) => (
@@ -262,10 +270,56 @@ export default function FactoryManager() {
           </div>
         </form>
       ) : (
-        <div className="flex justify-end mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="flex items-center gap-2 text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={factories.length > 0 && selected.length === factories.length}
+                onChange={(e) => setSelected(e.target.checked ? factories.map((f) => f.id) : [])}
+                className="w-4 h-4 accent-[#E61D25]"
+              />
+              {lang === 'ru' ? 'Выбрать все' : 'Ҳамаро интихоб кардан'}
+            </label>
+            {selected.length > 0 && (
+              <button
+                onClick={() => setConfirmDelete(factories.filter((f) => selected.includes(f.id)))}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500 text-white text-xs font-semibold hover:bg-red-500/90 transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> {lang === 'ru' ? `Удалить (${selected.length})` : `Нест кардан (${selected.length})`}
+              </button>
+            )}
+          </div>
           <Button onClick={openNew} className="bg-[#E61D25] hover:bg-[#E61D25]/90 text-white">
             <Plus className="w-4 h-4 mr-2" /> {lang === 'ru' ? 'Добавить завод' : 'Завод илова кардан'}
           </Button>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div className="p-5 rounded-2xl border border-red-500/30 bg-red-500/5 mb-4">
+          <p className="text-sm font-semibold text-red-500 mb-2">
+            {lang === 'ru' ? 'Вы хотите удалить:' : 'Шумо мехоҳед нест кунед:'}
+          </p>
+          <ul className="space-y-1 mb-3 max-h-40 overflow-y-auto">
+            {confirmDelete.map((f) => (
+              <li key={f.id} className="text-xs text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70">• {f.name_ru}</li>
+            ))}
+          </ul>
+          <div className="flex gap-2">
+            <button
+              onClick={() => remove(confirmDelete.map((f) => f.id))}
+              className="px-4 py-2 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-500/90"
+            >
+              {lang === 'ru' ? 'Да, удалить' : 'Бале, нест кунед'}
+            </button>
+            <button
+              onClick={() => setConfirmDelete(null)}
+              className="px-4 py-2 rounded-lg text-xs font-medium text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 hover:text-[#0A0A0A] dark:hover:text-[#F9F9F9]"
+            >
+              {lang === 'ru' ? 'Отмена' : 'Бекор'}
+            </button>
+          </div>
         </div>
       )}
 
@@ -277,7 +331,13 @@ export default function FactoryManager() {
       ) : (
         <div className="space-y-3">
           {factories.map((factory) => (
-            <div key={factory.id} className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5">
+            <div key={factory.id} className={`flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-[#111111] border ${selected.includes(factory.id) ? 'border-[#E61D25]/40' : 'border-black/5 dark:border-white/5'}`}>
+              <input
+                type="checkbox"
+                checked={selected.includes(factory.id)}
+                onChange={() => toggleSelected(factory.id)}
+                className="w-4 h-4 accent-[#E61D25] flex-shrink-0"
+              />
               {factory.image ? (
                 <img src={factory.image} alt="" className="w-11 h-11 rounded-xl object-cover flex-shrink-0" />
               ) : (
@@ -305,7 +365,7 @@ export default function FactoryManager() {
               <button onClick={() => openEdit(factory)} className="p-2 text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#C5A059] transition-colors">
                 <Pencil className="w-4 h-4" />
               </button>
-              <button onClick={() => remove(factory.id)} className="p-2 text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#E61D25] transition-colors">
+              <button onClick={() => setConfirmDelete([factory])} className="p-2 text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#E61D25] transition-colors">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>

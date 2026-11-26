@@ -11,11 +11,13 @@ import {
 import { getTypeLabel, getTypeIcon } from '@/lib/productTypes';
 import { telegramHref, whatsappHref } from '@/lib/factoryLinks';
 import BackButton from '@/components/layout/BackButton';
+import ContactIcon from '@/components/ContactIcon';
+import FactoryComments from '@/components/shop/FactoryComments';
 
-function ContactRow({ Icon, label, value, href }) {
+function ContactRow({ type, label, value, href }) {
   const content = (
     <>
-      <Icon className="w-4 h-4 flex-shrink-0 text-[#C5A059]" />
+      <ContactIcon type={type} size="sm" />
       <span className="text-[10px] uppercase tracking-wide text-[#0A0A0A]/35 dark:text-[#F9F9F9]/35 w-24 flex-shrink-0">{label}</span>
       <span className="text-sm text-[#0A0A0A]/75 dark:text-[#F9F9F9]/75 break-all">{value}</span>
     </>
@@ -146,11 +148,11 @@ export default function FactoryPage() {
                 </div>
               ) : hasContacts ? (
                 <div className="divide-y divide-black/5 dark:divide-white/5">
-                  {factory.phone && <ContactRow Icon={Phone} label={lang === 'ru' ? 'Телефон' : 'Телефон'} value={factory.phone} href={`tel:${factory.phone}`} />}
-                  {factory.telegram && <ContactRow Icon={Send} label="Telegram" value={factory.telegram} href={telegramHref(factory.telegram)} />}
-                  {factory.whatsapp && <ContactRow Icon={MessageSquare} label="WhatsApp" value={factory.whatsapp} href={whatsappHref(factory.whatsapp)} />}
-                  {factory.wechat && <ContactRow Icon={MessageSquare} label="WeChat" value={factory.wechat} />}
-                  {factory.website && <ContactRow Icon={Globe} label={lang === 'ru' ? 'Сайт' : 'Сайт'} value={factory.website} href={factory.website} />}
+                  {factory.phone && <ContactRow type="phone" label={lang === 'ru' ? 'Телефон' : 'Телефон'} value={factory.phone} href={`tel:${factory.phone}`} />}
+                  {factory.telegram && <ContactRow type="telegram" label="Telegram" value={factory.telegram} href={telegramHref(factory.telegram)} />}
+                  {factory.whatsapp && <ContactRow type="whatsapp" label="WhatsApp" value={factory.whatsapp} href={whatsappHref(factory.whatsapp)} />}
+                  {factory.wechat && <ContactRow type="wechat" label="WeChat" value={factory.wechat} />}
+                  {factory.website && <ContactRow type="website" label={lang === 'ru' ? 'Сайт' : 'Сайт'} value={factory.website} href={factory.website} />}
                 </div>
               ) : (
                 <p className="text-sm text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">
@@ -191,6 +193,8 @@ export default function FactoryPage() {
             {lang === 'ru' ? 'Найти товары' : 'Ёфтани молҳо'}
           </Link>
         </div>
+
+        <FactoryComments factoryId={factory.id} />
       </div>
     </div>
   );

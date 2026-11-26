@@ -7,6 +7,7 @@ import { ArrowLeft, MessageCircle, Package, ChevronLeft, ChevronRight, ShoppingC
 import { useCart } from '@/lib/CartContext.jsx';
 import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
 import ProductComments from '@/components/product/ProductComments';
+import BackButton from '@/components/layout/BackButton';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -61,9 +62,7 @@ export default function ProductDetail() {
   return (
     <div className="flex-1 pt-20 lg:pt-24 pb-16 bg-[#F9F9F9] dark:bg-[#0A0A0A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link to="/catalog" className="inline-flex items-center gap-2 text-sm text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 hover:text-[#E61D25] transition-colors mb-8">
-          <ArrowLeft className="w-4 h-4" /> {t('product.back')}
-        </Link>
+        <BackButton to="/catalog" className="mb-8" />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Gallery */}
