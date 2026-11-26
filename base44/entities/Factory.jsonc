@@ -62,6 +62,10 @@
       "type": "string",
       "description": "Website URL"
     },
+    "image": {
+      "type": "string",
+      "description": "Factory photo or logo URL"
+    },
     "requires_subscription": {
       "type": "boolean",
       "description": "If true, contacts are only visible to subscribed users",

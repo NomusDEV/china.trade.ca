@@ -8,6 +8,7 @@ import { Factory, Search, Package, ClipboardCheck, Truck, ArrowRight, Store, Loc
 import { PRODUCT_TYPES, getTypeLabel } from '@/lib/productTypes';
 import { telegramHref, whatsappHref } from '@/lib/factoryLinks';
 import FactoryCard from '@/components/shop/FactoryCard';
+import FactoryDetail from '@/components/shop/FactoryDetail';
 
 function ContactLine({ Icon, label, value, href }) {
   const content = (
@@ -35,6 +36,7 @@ export default function Shop() {
   const [selectedType, setSelectedType] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
+  const [detail, setDetail] = useState(null);
   const directoryRef = useRef(null);
   const panelRef = useRef(null);
 
@@ -278,6 +280,7 @@ export default function Shop() {
                         lang={lang}
                         selected={selectedIds.includes(factory.id)}
                         onToggle={toggleFactory}
+                        onOpen={setDetail}
                         locked={isLocked(factory)}
                       />
                     </motion.div>
@@ -366,6 +369,16 @@ export default function Shop() {
             : `${selectedFactories.length} интихоб · Нишон додани тамосҳо`}
         </button>
       )}
+
+      <FactoryDetail
+        factory={detail}
+        open={!!detail}
+        onClose={() => setDetail(null)}
+        lang={lang}
+        locked={detail ? isLocked(detail) : false}
+        selected={detail ? selectedIds.includes(detail.id) : false}
+        onToggle={toggleFactory}
+      />
     </div>
   );
 }

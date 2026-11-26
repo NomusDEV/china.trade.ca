@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
-import { Plus, Pencil, Trash2, Factory, X, Save } from 'lucide-react';
+import { Plus, Pencil, Trash2, Factory, X, Save, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PRODUCT_TYPES, getTypeLabel } from '@/lib/productTypes';
 
 const emptyForm = {
   name_ru: '', name_tj: '', type: '', country: '', city: '',
   phone: '', telegram: '', whatsapp: '', wechat: '', website: '',
-  description_ru: '', description_tj: '', status: 'active', requires_subscription: false,
+  description_ru: '', description_tj: '', status: 'active', requires_subscription: false, image: '',
 };
 
 export default function FactoryManager() {
@@ -19,6 +19,16 @@ export default function FactoryManager() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    setForm((prev) => ({ ...prev, image: file_url }));
+    setUploading(false);
+  };
 
   const load = async () => {
     setLoading(true);
@@ -161,6 +171,38 @@ export default function FactoryManager() {
             </div>
           </div>
 
+          <div className="mt-5">
+            <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2">
+              {lang === 'ru' ? 'Фото завода' : 'Сурати завод'}
+            </label>
+            <div className="flex items-center gap-3">
+              {form.image ? (
+                <div className="relative w-28 h-20 rounded-xl overflow-hidden group">
+                  <img src={form.image} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, image: '' })}
+                    className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+              ) : (
+                <label className="w-28 h-20 rounded-xl border-2 border-dashed border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 flex items-center justify-center cursor-pointer hover:border-[#C5A059] transition-colors">
+                  {uploading ? (
+                    <div className="w-5 h-5 border-2 border-[#E61D25]/20 border-t-[#E61D25] rounded-full animate-spin" />
+                  ) : (
+                    <Upload className="w-5 h-5 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30" />
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                </label>
+              )}
+              <p className="text-[11px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 max-w-[200px]">
+                {lang === 'ru' ? 'Загрузите фото или логотип завода' : 'Сурат ё логотипи заводро бор кунед'}
+              </p>
+            </div>
+          </div>
+
           <label className="flex items-center gap-3 mt-5 p-4 rounded-xl bg-[#C5A059]/5 border border-[#C5A059]/20 cursor-pointer">
             <input
               type="checkbox"
@@ -200,9 +242,13 @@ export default function FactoryManager() {
         <div className="space-y-3">
           {factories.map((factory) => (
             <div key={factory.id} className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#C5A059]/15 to-[#E61D25]/10 flex items-center justify-center flex-shrink-0">
-                <Factory className="w-5 h-5 text-[#C5A059]" />
-              </div>
+              {factory.image ? (
+                <img src={factory.image} alt="" className="w-11 h-11 rounded-xl object-cover flex-shrink-0" />
+              ) : (
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#C5A059]/15 to-[#E61D25]/10 flex items-center justify-center flex-shrink-0">
+                  <Factory className="w-5 h-5 text-[#C5A059]" />
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-sm text-[#0A0A0A] dark:text-[#F9F9F9] truncate">{factory.name_ru}</h3>
                 <p className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 truncate">
