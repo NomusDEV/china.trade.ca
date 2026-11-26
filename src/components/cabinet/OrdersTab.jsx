@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Package, ShoppingBag, DollarSign, Clock } from 'lucide-react';
+import { Package, ShoppingBag, DollarSign, Clock, CheckCircle2 } from 'lucide-react';
 
 export default function OrdersTab({ orders, loading, lang, t }) {
   const statusColors = {
@@ -68,7 +68,11 @@ export default function OrdersTab({ orders, loading, lang, t }) {
                 className={`p-4 rounded-xl border ${
                   order.status === 'cancelled'
                     ? 'bg-red-500/[0.07] border-red-500/40'
-                    : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/5 dark:border-white/5'
+                    : order.status === 'confirmed'
+                      ? 'bg-green-500/[0.07] border-green-500/40'
+                      : order.status === 'pending'
+                        ? 'bg-amber-500/[0.08] border-amber-500/40'
+                        : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/5 dark:border-white/5'
                 }`}
               >
                 <div className="flex items-start justify-between mb-2 gap-3">
@@ -106,6 +110,13 @@ export default function OrdersTab({ orders, loading, lang, t }) {
                   </span>
                   <span className="text-lg font-bold text-[#E61D25]">${(Number(order.total) || 0).toFixed(2)}</span>
                 </div>
+
+                {order.status === 'confirmed' && (
+                  <div className="mt-3 pt-3 border-t border-green-500/25 flex items-center gap-1.5 text-xs font-semibold text-green-600">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    {lang === 'ru' ? 'Ваш заказ успешно подтверждён и одобрен' : 'Фармоиши шумо бомуваффақият тасдиқ шуд'}
+                  </div>
+                )}
 
                 {order.status === 'cancelled' && (
                   <div className="mt-3 pt-3 border-t border-red-500/25">

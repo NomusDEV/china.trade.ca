@@ -50,6 +50,17 @@
           }
         }
       }
+    },
+    "subscription_activated_at": {
+      "type": "string",
+      "description": "Date and time when the subscription was activated by admin",
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
     }
   },
   "required": [

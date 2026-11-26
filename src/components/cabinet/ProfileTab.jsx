@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { User, Mail, Phone, MapPin, Camera, Save, CheckCircle, Shield, Trash2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Camera, Save, CheckCircle, Shield, Trash2, Crown, BadgeCheck } from 'lucide-react';
 import AvatarUpload from '@/components/AvatarUpload';
 import PhoneVerification from '@/components/PhoneVerification';
 
@@ -112,6 +112,33 @@ export default function ProfileTab({ user, lang, t, country, profile, setProfile
           </div>
         </div>
       </form>
+
+      <div className={`rounded-2xl border p-6 ${user?.subscription_active ? 'bg-[#C5A059]/5 border-[#C5A059]/30' : 'bg-white dark:bg-[#111111] border-black/5 dark:border-white/5'}`}>
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${user?.subscription_active ? 'bg-[#C5A059]/20' : 'bg-black/5 dark:bg-white/5'}`}>
+            <Crown className={`w-5 h-5 ${user?.subscription_active ? 'text-[#C5A059]' : 'text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30'}`} />
+          </div>
+          <div className="min-w-0">
+            <h3 className="font-semibold text-[#0A0A0A] dark:text-[#F9F9F9]">
+              {lang === 'ru' ? 'Подписка на контакты заводов' : 'Обуна ба тамосҳои заводҳо'}
+            </h3>
+            <p className={`text-xs font-medium mt-0.5 ${user?.subscription_active ? 'text-green-600' : 'text-[#0A0A0A]/45 dark:text-[#F9F9F9]/45'}`}>
+              {user?.subscription_active
+                ? (lang === 'ru' ? 'Ваша подписка активирована' : 'Обунаи шумо фаъол аст')
+                : (lang === 'ru' ? 'Подписка не активирована' : 'Обуна фаъол нест')}
+            </p>
+            {user?.subscription_active && user?.subscription_activated_at && (
+              <p className="text-[11px] text-[#C5A059] mt-1">
+                {lang === 'ru' ? 'Активирована' : 'Фаъол шуд'}:{' '}
+                {new Date(user.subscription_activated_at).toLocaleString(lang === 'tj' ? 'tg-TJ' : 'ru-RU', {
+                  day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+                })}
+              </p>
+            )}
+          </div>
+          {user?.subscription_active && <BadgeCheck className="ml-auto w-6 h-6 text-green-500 flex-shrink-0" />}
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Account info */}

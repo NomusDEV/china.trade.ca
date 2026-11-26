@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, ShoppingCart, User, Package, LogIn, Home as HomeIcon, Info, Phone, Store } from 'lucide-react';
+import { Sun, Moon, ShoppingCart, User, Package, LogIn, Home as HomeIcon, Info, Phone, Store, BadgeCheck } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { useTheme } from '@/lib/theme.jsx';
 import { useAuth } from '@/lib/AuthContext';
@@ -148,6 +148,12 @@ export default function Navbar() {
                     <p className="text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] truncate">
                       {isAuthenticated ? (user?.full_name || user?.email) : (lang === 'ru' ? 'Не авторизован' : 'Ворид нашуда')}
                     </p>
+                    {user?.subscription_active && (
+                      <p className="flex items-center gap-1 text-[10px] font-semibold text-[#C5A059] mt-1">
+                        <BadgeCheck className="w-3.5 h-3.5" />
+                        {lang === 'ru' ? 'Подписка активирована' : 'Обуна фаъол аст'}
+                      </p>
+                    )}
                   </div>
 
                   {user?.role === 'admin' && newOrders > 0 && (

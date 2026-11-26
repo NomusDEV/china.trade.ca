@@ -25,6 +25,11 @@ export default function FactoryManager() {
   const [uploading, setUploading] = useState(false);
   const [selected, setSelected] = useState([]);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [saveConfirm, setSaveConfirm] = useState(false);
+  const [bulkEdit, setBulkEdit] = useState(false);
+  const [bulkConfirm, setBulkConfirm] = useState(false);
+  const [bulkSaving, setBulkSaving] = useState(false);
+  const [bulkForm, setBulkForm] = useState({ type: '', country: '', city: '', status: '', subscription: '' });
 
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -50,10 +55,15 @@ export default function FactoryManager() {
     setForm({ ...emptyForm, ...factory });
     setShowForm(true);
   };
-  const closeForm = () => { setShowForm(false); setEditing(null); setForm(emptyForm); };
+  const closeForm = () => { setShowForm(false); setEditing(null); setForm(emptyForm); setSaveConfirm(false); };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    setSaveConfirm(true);
+  };
+
+  const performSave = async () => {
+    setSaveConfirm(false);
     setSaving(true);
     const data = { ...form };
     delete data.id;
@@ -82,6 +92,28 @@ export default function FactoryManager() {
 
   const toggleSelected = (id) => {
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const applyBulk = async () => {
+    const patch = {};
+    if (bulkForm.type) patch.type = bulkForm.type;
+    if (bulkForm.country.trim()) patch.country = bulkForm.country.trim();
+    if (bulkForm.city.trim()) patch.city = bulkForm.city.trim();
+    if (bulkForm.status) patch.status = bulkForm.status;
+    if (bulkForm.subscription) patch.requires_subscription = bulkForm.subscription === 'yes';
+
+    if (Object.keys(patch).length === 0) {
+      setBulkConfirm(false);
+      return;
+    }
+    setBulkSaving(true);
+    await base44.entities.Factory.bulkUpdate(selected.map((id) => ({ id, ...patch })));
+    setBulkSaving(false);
+    setBulkEdit(false);
+    setBulkConfirm(false);
+    setSelected([]);
+    setBulkForm({ type: '', country: '', city: '', status: '', subscription: '' });
+    load();
   };
 
   const field = (key, label, props = {}) => (
@@ -259,14 +291,30 @@ export default function FactoryManager() {
             </span>
           </label>
 
-          <div className="flex gap-3 pt-5">
-            <Button type="submit" disabled={saving} className="bg-[#E61D25] hover:bg-[#E61D25]/90 text-white">
-              <Save className="w-4 h-4 mr-2" />
-              {saving ? '...' : (lang === 'ru' ? 'Сохранить' : 'Нигоҳ доштан')}
-            </Button>
-            <Button type="button" variant="outline" onClick={closeForm}>
-              {lang === 'ru' ? 'Отмена' : 'Бекор кардан'}
-            </Button>
+          <div className="flex flex-wrap items-center gap-3 pt-5">
+            {saveConfirm ? (
+              <>
+                <span className="text-sm font-medium text-[#0A0A0A] dark:text-[#F9F9F9]">
+                  {lang === 'ru' ? 'Сохранить изменения завода?' : 'Тағйиротро нигоҳ дорам?'}
+                </span>
+                <Button type="button" onClick={performSave} disabled={saving} className="bg-green-600 hover:bg-green-600/90 text-white">
+                  <Save className="w-4 h-4 mr-2" /> {lang === 'ru' ? 'Да, сохранить' : 'Бале, нигоҳ доред'}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => setSaveConfirm(false)}>
+                  {lang === 'ru' ? 'Нет' : 'Не'}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button type="submit" disabled={saving} className="bg-[#E61D25] hover:bg-[#E61D25]/90 text-white">
+                  <Save className="w-4 h-4 mr-2" />
+                  {saving ? '...' : (lang === 'ru' ? 'Сохранить' : 'Нигоҳ доштан')}
+                </Button>
+                <Button type="button" variant="outline" onClick={closeForm}>
+                  {lang === 'ru' ? 'Отмена' : 'Бекор кардан'}
+                </Button>
+              </>
+            )}
           </div>
         </form>
       ) : (
@@ -282,17 +330,139 @@ export default function FactoryManager() {
               {lang === 'ru' ? 'Выбрать все' : 'Ҳамаро интихоб кардан'}
             </label>
             {selected.length > 0 && (
-              <button
-                onClick={() => setConfirmDelete(factories.filter((f) => selected.includes(f.id)))}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500 text-white text-xs font-semibold hover:bg-red-500/90 transition-colors"
-              >
-                <Trash2 className="w-3.5 h-3.5" /> {lang === 'ru' ? `Удалить (${selected.length})` : `Нест кардан (${selected.length})`}
-              </button>
+              <>
+                <button
+                  onClick={() => setBulkEdit(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#C5A059] text-white text-xs font-semibold hover:bg-[#C5A059]/90 transition-colors"
+                >
+                  <Pencil className="w-3.5 h-3.5" /> {lang === 'ru' ? `Редактировать (${selected.length})` : `Таҳрир (${selected.length})`}
+                </button>
+                <button
+                  onClick={() => setConfirmDelete(factories.filter((f) => selected.includes(f.id)))}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500 text-white text-xs font-semibold hover:bg-red-500/90 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> {lang === 'ru' ? `Удалить (${selected.length})` : `Нест кардан (${selected.length})`}
+                </button>
+              </>
             )}
           </div>
           <Button onClick={openNew} className="bg-[#E61D25] hover:bg-[#E61D25]/90 text-white">
             <Plus className="w-4 h-4 mr-2" /> {lang === 'ru' ? 'Добавить завод' : 'Завод илова кардан'}
           </Button>
+        </div>
+      )}
+
+      {bulkEdit && selected.length > 0 && (
+        <div className="p-5 rounded-2xl border border-[#C5A059]/30 bg-[#C5A059]/5 mb-4">
+          <p className="text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] mb-1">
+            {lang === 'ru' ? `Редактировать выбранные заводы (${selected.length})` : `Таҳрири заводҳои интихобшуда (${selected.length})`}
+          </p>
+          <p className="text-[11px] text-[#0A0A0A]/45 dark:text-[#F9F9F9]/45 mb-4">
+            {lang === 'ru' ? 'Заполните только те поля, которые нужно изменить' : 'Танҳо майдонҳои заруриро пур кунед'}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2">
+                {lang === 'ru' ? 'Направление' : 'Самт'}
+              </label>
+              <select
+                value={bulkForm.type}
+                onChange={(e) => setBulkForm({ ...bulkForm, type: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 bg-white dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059] [color-scheme:light] dark:[color-scheme:dark]"
+              >
+                <option value="">{lang === 'ru' ? 'Не менять' : 'Тағйир надиҳед'}</option>
+                {PRODUCT_TYPES.map((tp) => (
+                  <option key={tp.value} value={tp.value}>{lang === 'tj' ? tp.label_tj : tp.label_ru}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2">
+                {lang === 'ru' ? 'Страна' : 'Кишвар'}
+              </label>
+              <input
+                value={bulkForm.country}
+                onChange={(e) => setBulkForm({ ...bulkForm, country: e.target.value })}
+                placeholder={lang === 'ru' ? 'Не менять' : 'Тағйир надиҳед'}
+                className="w-full px-4 py-3 rounded-xl border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 bg-white dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2">
+                {lang === 'ru' ? 'Город' : 'Шаҳр'}
+              </label>
+              <input
+                value={bulkForm.city}
+                onChange={(e) => setBulkForm({ ...bulkForm, city: e.target.value })}
+                placeholder={lang === 'ru' ? 'Не менять' : 'Тағйир надиҳед'}
+                className="w-full px-4 py-3 rounded-xl border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 bg-white dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2">
+                {lang === 'ru' ? 'Статус' : 'Вазъият'}
+              </label>
+              <select
+                value={bulkForm.status}
+                onChange={(e) => setBulkForm({ ...bulkForm, status: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 bg-white dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059] [color-scheme:light] dark:[color-scheme:dark]"
+              >
+                <option value="">{lang === 'ru' ? 'Не менять' : 'Тағйир надиҳед'}</option>
+                <option value="active">{lang === 'ru' ? 'Активный' : 'Фаъол'}</option>
+                <option value="inactive">{lang === 'ru' ? 'Неактивный' : 'Ғайрифаъол'}</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2">
+                {lang === 'ru' ? 'Доступ к контактам' : 'Дастрасӣ ба тамосҳо'}
+              </label>
+              <select
+                value={bulkForm.subscription}
+                onChange={(e) => setBulkForm({ ...bulkForm, subscription: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 bg-white dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059] [color-scheme:light] dark:[color-scheme:dark]"
+              >
+                <option value="">{lang === 'ru' ? 'Не менять' : 'Тағйир надиҳед'}</option>
+                <option value="yes">{lang === 'ru' ? 'Только по подписке' : 'Танҳо бо обуна'}</option>
+                <option value="no">{lang === 'ru' ? 'Открытые для всех' : 'Барои ҳама кушода'}</option>
+              </select>
+            </div>
+          </div>
+
+          {bulkConfirm ? (
+            <div className="flex flex-wrap items-center gap-3 mt-4">
+              <span className="text-xs font-medium text-[#0A0A0A] dark:text-[#F9F9F9]">
+                {lang === 'ru' ? `Применить изменения к ${selected.length} заводам?` : `Тағйирот ба ${selected.length} завод татбиқ шавад?`}
+              </span>
+              <button
+                onClick={applyBulk}
+                disabled={bulkSaving}
+                className="px-4 py-2 rounded-lg bg-green-600 text-white text-xs font-semibold hover:bg-green-600/90 disabled:opacity-50"
+              >
+                {lang === 'ru' ? 'Да, применить' : 'Бале, татбиқ кунед'}
+              </button>
+              <button
+                onClick={() => setBulkConfirm(false)}
+                className="px-4 py-2 rounded-lg text-xs font-medium text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50"
+              >
+                {lang === 'ru' ? 'Нет' : 'Не'}
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => setBulkConfirm(true)}
+                className="px-4 py-2 rounded-lg bg-[#C5A059] text-white text-xs font-semibold hover:bg-[#C5A059]/90"
+              >
+                {lang === 'ru' ? 'Применить' : 'Татбиқ кардан'}
+              </button>
+              <button
+                onClick={() => { setBulkEdit(false); setBulkConfirm(false); }}
+                className="px-4 py-2 rounded-lg text-xs font-medium text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 hover:text-[#0A0A0A] dark:hover:text-[#F9F9F9]"
+              >
+                {lang === 'ru' ? 'Отмена' : 'Бекор'}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

@@ -119,7 +119,19 @@ export default function FactoryPage() {
             <span className="text-xs text-[#C5A059] font-semibold tracking-widest uppercase">
               {getTypeLabel(factory.type, lang)}
             </span>
-            <h1 className="text-3xl lg:text-4xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9] mt-2 mb-4">{name}</h1>
+            <h1 className="text-3xl lg:text-4xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9] mt-2 mb-2">{name}</h1>
+            <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[#0A0A0A]/35 dark:text-[#F9F9F9]/35 mb-4">
+              <span>
+                {lang === 'ru' ? 'Добавлен' : 'Илова шуд'}:{' '}
+                {new Date(factory.created_date).toLocaleDateString(lang === 'tj' ? 'tg-TJ' : 'ru-RU')}
+              </span>
+              {factory.updated_date && (
+                <span>
+                  {lang === 'ru' ? 'Обновлён' : 'Нав карда шуд'}:{' '}
+                  {new Date(factory.updated_date).toLocaleDateString(lang === 'tj' ? 'tg-TJ' : 'ru-RU')}
+                </span>
+              )}
+            </p>
 
             {location && (
               <p className="flex items-center gap-2 text-sm text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-6">

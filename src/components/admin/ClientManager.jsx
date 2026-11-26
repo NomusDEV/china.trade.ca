@@ -172,6 +172,7 @@ function ClientDetail({ user, orders, messages, onBack, onMessagesUpdate, lang }
   const [replyText, setReplyText] = useState('');
   const [sending, setSending] = useState(false);
   const [subscribed, setSubscribed] = useState(!!user.subscription_active);
+  const [activatedAt, setActivatedAt] = useState(user.subscription_activated_at || '');
   const [savingSub, setSavingSub] = useState(false);
   const messagesEndRef = useRef(null);
 
@@ -179,8 +180,13 @@ function ClientDetail({ user, orders, messages, onBack, onMessagesUpdate, lang }
     setSavingSub(true);
     try {
       const next = !subscribed;
-      await base44.entities.User.update(user.id, { subscription_active: next });
+      const stamp = next ? new Date().toISOString() : '';
+      await base44.entities.User.update(user.id, {
+        subscription_active: next,
+        subscription_activated_at: stamp,
+      });
       setSubscribed(next);
+      setActivatedAt(stamp);
     } catch (e) {}
     setSavingSub(false);
   };
@@ -283,6 +289,14 @@ function ClientDetail({ user, orders, messages, onBack, onMessagesUpdate, lang }
                   ? (lang === 'ru' ? 'Активна — клиент видит закрытые контакты' : 'Фаъол — муштарӣ тамосҳои пӯшидаро мебинад')
                   : (lang === 'ru' ? 'Не активна' : 'Ғайрифаъол')}
               </p>
+              {subscribed && activatedAt && (
+                <p className="text-[10px] text-[#C5A059] mt-0.5">
+                  {lang === 'ru' ? 'Активирована' : 'Фаъол шуд'}:{' '}
+                  {new Date(activatedAt).toLocaleString(lang === 'tj' ? 'tg-TJ' : 'ru-RU', {
+                    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+                  })}
+                </p>
+              )}
             </div>
           </div>
           <button

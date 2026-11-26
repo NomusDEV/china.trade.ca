@@ -112,7 +112,19 @@ export default function ProductDetail() {
           {/* Info */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <span className="text-xs text-[#C5A059] font-medium tracking-wider uppercase">{product.category}</span>
-            <h1 className="text-2xl lg:text-3xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9] mt-2 mb-6">{getName()}</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9] mt-2 mb-2">{getName()}</h1>
+            <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[#0A0A0A]/35 dark:text-[#F9F9F9]/35 mb-6">
+              <span>
+                {lang === 'ru' ? 'Добавлен' : 'Илова шуд'}:{' '}
+                {new Date(product.created_date).toLocaleDateString(lang === 'tj' ? 'tg-TJ' : 'ru-RU')}
+              </span>
+              {product.updated_date && (
+                <span>
+                  {lang === 'ru' ? 'Обновлён' : 'Нав карда шуд'}:{' '}
+                  {new Date(product.updated_date).toLocaleDateString(lang === 'tj' ? 'tg-TJ' : 'ru-RU')}
+                </span>
+              )}
+            </p>
 
             <div className="flex items-baseline gap-4 mb-8 pb-8 border-b border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10">
               <div>
