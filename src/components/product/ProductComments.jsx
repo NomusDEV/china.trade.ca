@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { useAuth } from '@/lib/AuthContext';
 import { motion } from 'framer-motion';
-import { Star, MessageSquare, Reply, Send, Loader2, MessageCircle, Pencil, Trash2, Check, X } from 'lucide-react';
+import { Star, MessageSquare, Reply, Send, Loader2, MessageCircle, Pencil, Trash2, Check, X, Heart } from 'lucide-react';
 
 function StarRating({ value = 0, onChange, size = 'sm' }) {
   const [hover, setHover] = useState(0);
@@ -34,7 +34,7 @@ function StarRating({ value = 0, onChange, size = 'sm' }) {
   );
 }
 
-function CommentItem({ comment, replies, productId, onReply, onEdit, onDelete, currentUser, lang, t, depth = 0 }) {
+function CommentItem({ comment, replies, productId, likes, likesFor, onToggleLike, onReply, onEdit, onDelete, currentUser, lang, t, depth = 0 }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -166,12 +166,22 @@ function CommentItem({ comment, replies, productId, onReply, onEdit, onDelete, c
             </button>
           </div>
         ) : (
-          <button
-            onClick={() => setShowReplyForm(!showReplyForm)}
-            className="flex items-center gap-1.5 mt-1.5 ml-2 text-xs text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#C5A059] transition-colors"
-          >
-            <Reply className="w-3.5 h-3.5" /> {t('comments.reply')}
-          </button>
+          <div className="flex items-center gap-4 mt-1.5 ml-2">
+            <button
+              onClick={() => onToggleLike(comment.id)}
+              className={`inline-flex items-center gap-1.5 text-xs transition-colors ${
+                likes?.likedByMe ? 'text-[#E61D25]' : 'text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#E61D25]'
+              }`}
+            >
+              <Heart className={`w-3.5 h-3.5 ${likes?.likedByMe ? 'fill-[#E61D25]' : ''}`} /> {likes?.count || 0}
+            </button>
+            <button
+              onClick={() => setShowReplyForm(!showReplyForm)}
+              className="flex items-center gap-1.5 text-xs text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#C5A059] transition-colors"
+            >
+              <Reply className="w-3.5 h-3.5" /> {t('comments.reply')}
+            </button>
+          </div>
         )}
 
         {showReplyForm && (
@@ -197,6 +207,9 @@ function CommentItem({ comment, replies, productId, onReply, onEdit, onDelete, c
                 comment={reply}
                 replies={[]}
                 productId={productId}
+                likes={likesFor ? likesFor(reply.id) : undefined}
+                likesFor={likesFor}
+                onToggleLike={onToggleLike}
                 onReply={onReply}
                 onEdit={onEdit}
                 onDelete={onDelete}
@@ -224,6 +237,7 @@ export default function ProductComments({ productId }) {
   const [activeTab, setActiveTab] = useState('reviews'); // reviews | comments
   const [ratingFilter, setRatingFilter] = useState(0);
   const [sortBy, setSortBy] = useState('newest');
+  const [likes, setLikes] = useState([]);
 
   useEffect(() => {
     loadComments();
@@ -234,6 +248,12 @@ export default function ProductComments({ productId }) {
     try {
       const all = await base44.entities.Comment.filter({ product_id: productId }, '-created_date');
       setComments(all);
+      if (all.length > 0) {
+        const allLikes = await base44.entities.ReviewLike.filter({ review_id: { $in: all.map((c) => c.id) } });
+        setLikes(allLikes);
+      } else {
+        setLikes([]);
+      }
     } catch {}
     setLoading(false);
   };
@@ -307,6 +327,25 @@ export default function ProductComments({ productId }) {
   }));
 
   const getReplies = (commentId) => comments.filter((c) => c.parent_id === commentId);
+
+  const likesFor = (id) => {
+    const forId = likes.filter((l) => l.review_id === id);
+    return { count: forId.length, likedByMe: !!user && forId.some((l) => l.user_id === user.id) };
+  };
+
+  const toggleLike = async (id) => {
+    if (!isAuthenticated) return;
+    const mine = likes.find((l) => l.review_id === id && l.user_id === user.id);
+    if (mine) {
+      await base44.entities.ReviewLike.delete(mine.id);
+    } else {
+      await base44.entities.ReviewLike.create({ review_id: id, user_id: user.id });
+    }
+    if (comments.length > 0) {
+      const allLikes = await base44.entities.ReviewLike.filter({ review_id: { $in: comments.map((c) => c.id) } });
+      setLikes(allLikes);
+    }
+  };
 
   return (
     <div className="mt-12">
@@ -453,6 +492,9 @@ export default function ProductComments({ productId }) {
                 comment={comment}
                 replies={getReplies(comment.id)}
                 productId={productId}
+                likes={likesFor(comment.id)}
+                likesFor={likesFor}
+                onToggleLike={toggleLike}
                 onReply={handleReply}
                 onEdit={handleEdit}
                 onDelete={handleDelete}

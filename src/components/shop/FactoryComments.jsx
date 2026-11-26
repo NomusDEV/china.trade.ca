@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { useAuth } from '@/lib/AuthContext';
 import { motion } from 'framer-motion';
-import { Star, Send, Loader2, MessageSquare, Pencil, Trash2, Check, X } from 'lucide-react';
+import { Star, Send, Loader2, MessageSquare, Pencil, Trash2, Check, X, Heart, Reply } from 'lucide-react';
 
 function Stars({ value = 0, onChange, size = 'sm' }) {
   const [hover, setHover] = useState(0);
@@ -34,12 +34,63 @@ function Stars({ value = 0, onChange, size = 'sm' }) {
   );
 }
 
-function ReviewCard({ review, currentUser, lang, onEdit, onDelete }) {
+function Avatar({ src, name, size = 'w-10 h-10' }) {
+  return (
+    <div className={`${size} rounded-full bg-gradient-to-br from-[#E61D25] to-[#C5A059] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden`}>
+      {src ? <img src={src} alt="" className="w-full h-full object-cover" /> : (name || '?').charAt(0).toUpperCase()}
+    </div>
+  );
+}
+
+function LikeButton({ liked, count, onClick, lang }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={lang === 'ru' ? 'Нравится' : 'Писанд аст'}
+      className={`inline-flex items-center gap-1.5 text-xs transition-colors ${
+        liked ? 'text-[#E61D25]' : 'text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#E61D25]'
+      }`}
+    >
+      <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-[#E61D25]' : ''}`} />
+      {count || 0}
+    </button>
+  );
+}
+
+function ReplyItem({ reply, likes, onToggleLike, lang }) {
+  const date = new Date(reply.created_date).toLocaleDateString(lang === 'tj' ? 'tg-TJ' : 'ru-RU', {
+    day: 'numeric', month: 'short', year: 'numeric',
+  });
+
+  return (
+    <div className="flex gap-2.5">
+      <Avatar src={reply.user_avatar} name={reply.user_name} size="w-8 h-8" />
+      <div className="flex-1 min-w-0">
+        <div className="rounded-xl bg-black/[0.03] dark:bg-white/[0.04] p-3">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] truncate">{reply.user_name || 'Аноним'}</span>
+            <span className="text-[10px] text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30">{date}</span>
+          </div>
+          <p className="text-xs text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 whitespace-pre-wrap break-words">{reply.text}</p>
+        </div>
+        <div className="mt-1 ml-1">
+          <LikeButton liked={likes?.likedByMe} count={likes?.count} onClick={() => onToggleLike(reply.id)} lang={lang} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ReviewCard({ review, replies, likes, onToggleLike, repliesLikes, onReply, currentUser, lang, onEdit, onDelete }) {
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(review.text || '');
   const [editRating, setEditRating] = useState(review.rating || 0);
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showReply, setShowReply] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
 
   const canManage = !!currentUser && (
     currentUser.id === review.user_id ||
@@ -59,15 +110,19 @@ function ReviewCard({ review, currentUser, lang, onEdit, onDelete }) {
     setEditing(false);
   };
 
+  const sendReply = async (e) => {
+    e.preventDefault();
+    if (!replyText.trim()) return;
+    setSendingReply(true);
+    await onReply(review.id, replyText.trim());
+    setReplyText('');
+    setShowReply(false);
+    setSendingReply(false);
+  };
+
   return (
     <div className="flex gap-3">
-      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#E61D25] to-[#C5A059] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
-        {review.user_avatar ? (
-          <img src={review.user_avatar} alt="" className="w-full h-full object-cover" />
-        ) : (
-          (review.user_name || '?').charAt(0).toUpperCase()
-        )}
-      </div>
+      <Avatar src={review.user_avatar} name={review.user_name} />
 
       <div className="flex-1 min-w-0">
         <div className="rounded-2xl bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5 p-4">
@@ -132,7 +187,7 @@ function ReviewCard({ review, currentUser, lang, onEdit, onDelete }) {
           )}
         </div>
 
-        {confirmDelete && (
+        {confirmDelete ? (
           <div className="flex items-center gap-3 mt-2 ml-2">
             <span className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50">
               {lang === 'ru' ? 'Удалить отзыв?' : 'Шарҳро нест кунам?'}
@@ -144,6 +199,45 @@ function ReviewCard({ review, currentUser, lang, onEdit, onDelete }) {
               {lang === 'ru' ? 'Отмена' : 'Бекор'}
             </button>
           </div>
+        ) : (
+          <div className="flex items-center gap-4 mt-2 ml-2">
+            <LikeButton liked={likes?.likedByMe} count={likes?.count} onClick={() => onToggleLike(review.id)} lang={lang} />
+            <button
+              onClick={() => setShowReply(!showReply)}
+              className="flex items-center gap-1.5 text-xs text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#C5A059] transition-colors"
+            >
+              <Reply className="w-3.5 h-3.5" /> {lang === 'ru' ? 'Ответить' : 'Ҷавоб додан'}
+            </button>
+          </div>
+        )}
+
+        {showReply && (
+          <form onSubmit={sendReply} className="mt-2 ml-2 flex gap-2">
+            <input
+              type="text"
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder={lang === 'ru' ? 'Напишите ответ...' : 'Ҷавоб нависед...'}
+              className="flex-1 px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]"
+            />
+            <button type="submit" disabled={sendingReply || !replyText.trim()} className="px-3 py-2 bg-[#C5A059] text-white rounded-lg text-sm disabled:opacity-50">
+              {sendingReply ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            </button>
+          </form>
+        )}
+
+        {replies?.length > 0 && (
+          <div className="mt-3 ml-2 space-y-3">
+            {replies.map((reply) => (
+              <ReplyItem
+                key={reply.id}
+                reply={reply}
+                likes={repliesLikes(reply.id)}
+                onToggleLike={onToggleLike}
+                lang={lang}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>
@@ -153,7 +247,8 @@ function ReviewCard({ review, currentUser, lang, onEdit, onDelete }) {
 export default function FactoryComments({ factoryId }) {
   const { lang } = useLanguage();
   const { user, isAuthenticated } = useAuth();
-  const [reviews, setReviews] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [likes, setLikes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(0);
   const [text, setText] = useState('');
@@ -163,7 +258,13 @@ export default function FactoryComments({ factoryId }) {
 
   const load = async () => {
     const all = await base44.entities.Comment.filter({ factory_id: factoryId }, '-created_date');
-    setReviews(all.filter((c) => !c.parent_id));
+    setComments(all);
+    if (all.length > 0) {
+      const allLikes = await base44.entities.ReviewLike.filter({ review_id: { $in: all.map((c) => c.id) } });
+      setLikes(allLikes);
+    } else {
+      setLikes([]);
+    }
     setLoading(false);
   };
 
@@ -171,6 +272,25 @@ export default function FactoryComments({ factoryId }) {
     setLoading(true);
     load();
   }, [factoryId]);
+
+  const likesFor = (id) => {
+    const forId = likes.filter((l) => l.review_id === id);
+    return { count: forId.length, likedByMe: !!user && forId.some((l) => l.user_id === user.id) };
+  };
+
+  const toggleLike = async (id) => {
+    if (!isAuthenticated) return;
+    const mine = likes.find((l) => l.review_id === id && l.user_id === user.id);
+    if (mine) {
+      await base44.entities.ReviewLike.delete(mine.id);
+    } else {
+      await base44.entities.ReviewLike.create({ review_id: id, user_id: user.id });
+    }
+    if (comments.length > 0) {
+      const allLikes = await base44.entities.ReviewLike.filter({ review_id: { $in: comments.map((c) => c.id) } });
+      setLikes(allLikes);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -191,15 +311,36 @@ export default function FactoryComments({ factoryId }) {
     load();
   };
 
+  const handleReply = async (parentId, replyText) => {
+    await base44.entities.Comment.create({
+      factory_id: factoryId,
+      user_id: user.id,
+      user_name: user.full_name || user.email?.split('@')[0],
+      user_avatar: user.avatar || '',
+      text: replyText,
+      rating: 0,
+      parent_id: parentId,
+      type: 'reply',
+    });
+    load();
+  };
+
   const handleEdit = async (id, payload) => {
     await base44.entities.Comment.update(id, payload);
     load();
   };
 
   const handleDelete = async (review) => {
+    const children = comments.filter((c) => c.parent_id === review.id);
+    for (const child of children) {
+      await base44.entities.Comment.delete(child.id);
+    }
     await base44.entities.Comment.delete(review.id);
     load();
   };
+
+  const reviews = comments.filter((c) => !c.parent_id);
+  const repliesFor = (id) => comments.filter((c) => c.parent_id === id);
 
   const avgRating = reviews.length > 0 ? reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length : 0;
   const ratingCounts = [5, 4, 3, 2, 1].map((star) => ({
@@ -265,9 +406,7 @@ export default function FactoryComments({ factoryId }) {
       {isAuthenticated ? (
         <form onSubmit={handleSubmit} className="mb-8 p-4 rounded-2xl bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#E61D25] to-[#C5A059] flex items-center justify-center text-white font-bold text-sm overflow-hidden">
-              {user?.avatar ? <img src={user.avatar} alt="" className="w-full h-full object-cover" /> : (user?.full_name || '?').charAt(0).toUpperCase()}
-            </div>
+            <Avatar src={user?.avatar} name={user?.full_name} size="w-9 h-9" />
             <span className="text-sm font-medium text-[#0A0A0A] dark:text-[#F9F9F9]">{user?.full_name || user?.email}</span>
           </div>
           <p className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 mb-1.5">
@@ -325,6 +464,11 @@ export default function FactoryComments({ factoryId }) {
             >
               <ReviewCard
                 review={review}
+                replies={repliesFor(review.id)}
+                likes={likesFor(review.id)}
+                repliesLikes={likesFor}
+                onToggleLike={toggleLike}
+                onReply={handleReply}
                 currentUser={user}
                 lang={lang}
                 onEdit={handleEdit}

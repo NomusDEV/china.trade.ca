@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
-import { Plus, Pencil, Trash2, Factory, X, Save, Upload } from 'lucide-react';
+import { Plus, Pencil, Trash2, Factory, X, Save, Upload, Sparkles, Loader2, ChevronDown, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PRODUCT_TYPES, getTypeLabel } from '@/lib/productTypes';
 
@@ -30,6 +30,19 @@ export default function FactoryManager() {
   const [bulkConfirm, setBulkConfirm] = useState(false);
   const [bulkSaving, setBulkSaving] = useState(false);
   const [bulkForm, setBulkForm] = useState({ type: '', country: '', city: '', status: '', subscription: '' });
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const [generatingImage, setGeneratingImage] = useState(false);
+
+  const generateFactoryImage = async () => {
+    setGeneratingImage(true);
+    try {
+      const prompt = `Professional photo of a modern manufacturing factory${form.name_ru ? ` of ${form.name_ru}` : ''}${form.city ? ` in ${form.city}` : ''}${form.country ? `, ${form.country}` : ''}. Industrial building exterior, clean daylight, realistic, wide angle, no text or watermarks.`;
+      const { url } = await base44.integrations.Core.GenerateImage({ prompt });
+      setForm((prev) => ({ ...prev, image: url }));
+    } finally {
+      setGeneratingImage(false);
+    }
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -273,6 +286,15 @@ export default function FactoryManager() {
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                 </label>
               )}
+              <button
+                type="button"
+                onClick={generateFactoryImage}
+                disabled={generatingImage}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-[#C5A059]/50 text-[#C5A059] text-xs font-medium hover:bg-[#C5A059]/5 disabled:opacity-50 transition-colors"
+              >
+                {generatingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                {lang === 'ru' ? 'Сгенерировать фото' : 'Сурат сохтан'}
+              </button>
               <p className="text-[11px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 max-w-[200px]">
                 {lang === 'ru' ? 'Загрузите фото или логотип завода' : 'Сурат ё логотипи заводро бор кунед'}
               </p>
@@ -330,20 +352,32 @@ export default function FactoryManager() {
               {lang === 'ru' ? 'Выбрать все' : 'Ҳамаро интихоб кардан'}
             </label>
             {selected.length > 0 && (
-              <>
+              <div className="relative">
                 <button
-                  onClick={() => setBulkEdit(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#C5A059] text-white text-xs font-semibold hover:bg-[#C5A059]/90 transition-colors"
+                  onClick={() => setActionsOpen(!actionsOpen)}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0A0A0A] dark:bg-white text-white dark:text-[#0A0A0A] text-xs font-semibold hover:opacity-90 transition-opacity"
                 >
-                  <Pencil className="w-3.5 h-3.5" /> {lang === 'ru' ? `Редактировать (${selected.length})` : `Таҳрир (${selected.length})`}
+                  <Settings2 className="w-3.5 h-3.5" />
+                  {lang === 'ru' ? `Действия (${selected.length})` : `Амалҳо (${selected.length})`}
+                  <ChevronDown className="w-3.5 h-3.5" />
                 </button>
-                <button
-                  onClick={() => setConfirmDelete(factories.filter((f) => selected.includes(f.id)))}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500 text-white text-xs font-semibold hover:bg-red-500/90 transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" /> {lang === 'ru' ? `Удалить (${selected.length})` : `Нест кардан (${selected.length})`}
-                </button>
-              </>
+                {actionsOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-48 rounded-xl bg-white dark:bg-[#111111] shadow-xl border border-black/5 dark:border-white/5 p-1 z-20">
+                    <button
+                      onClick={() => { setBulkEdit(true); setActionsOpen(false); }}
+                      className="flex w-full items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> {lang === 'ru' ? 'Редактировать' : 'Таҳрир кардан'}
+                    </button>
+                    <button
+                      onClick={() => { setConfirmDelete(factories.filter((f) => selected.includes(f.id))); setActionsOpen(false); }}
+                      className="flex w-full items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-500 hover:bg-red-500/5 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> {lang === 'ru' ? 'Удалить' : 'Нест кардан'}
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
           <Button onClick={openNew} className="bg-[#E61D25] hover:bg-[#E61D25]/90 text-white">
@@ -515,7 +549,7 @@ export default function FactoryManager() {
                   <Factory className="w-5 h-5 text-[#C5A059]" />
                 </div>
               )}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 cursor-pointer" onClick={() => openEdit(factory)}>
                 <h3 className="font-medium text-sm text-[#0A0A0A] dark:text-[#F9F9F9] truncate">{factory.name_ru}</h3>
                 <p className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 truncate">
                   {getTypeLabel(factory.type, lang)}

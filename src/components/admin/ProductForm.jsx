@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { Button } from '@/components/ui/button';
-import { X, Upload, Image } from 'lucide-react';
+import { X, Upload, Image, Sparkles, Loader2 } from 'lucide-react';
 import { PRODUCT_TYPES } from '@/lib/productTypes';
 
 export default function ProductForm({ product, categories, onSave, onCancel }) {
@@ -23,6 +23,18 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [generatingImage, setGeneratingImage] = useState(false);
+
+  const generateImage = async () => {
+    setGeneratingImage(true);
+    try {
+      const prompt = `Professional e-commerce product photo of ${form.name_ru || form.name_tj || 'wholesale product'}${form.category ? `, ${form.category}` : ''}. Clean studio lighting, light neutral background, sharp focus, realistic, centered composition, no text or watermarks.`;
+      const { url } = await base44.integrations.Core.GenerateImage({ prompt });
+      setForm((prev) => ({ ...prev, images: [...prev.images, url] }));
+    } finally {
+      setGeneratingImage(false);
+    }
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -151,6 +163,15 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
               )}
               <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
             </label>
+            <button
+              type="button"
+              onClick={generateImage}
+              disabled={generatingImage}
+              className="inline-flex flex-col items-center justify-center gap-1.5 w-20 h-20 rounded-lg border border-dashed border-[#C5A059]/50 text-[#C5A059] text-[10px] font-medium hover:bg-[#C5A059]/5 disabled:opacity-50 transition-colors"
+            >
+              {generatingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              {lang === 'ru' ? 'Сгенерировать' : 'Сохтан'}
+            </button>
           </div>
         </div>
 
