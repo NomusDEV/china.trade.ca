@@ -15,6 +15,7 @@ import { SiteSettingsProvider } from '@/lib/SiteSettingsContext.jsx';
 import SiteLayout from '@/components/layout/SiteLayout';
 import Home from '@/pages/Home';
 import Catalog from '@/pages/Catalog';
+import Shop from '@/pages/Shop';
 import ProductDetail from '@/pages/ProductDetail';
 import Services from '@/pages/Services';
 import About from '@/pages/About';
@@ -56,6 +57,7 @@ const AuthenticatedApp = () => {
       <Route element={<SiteLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/catalog" element={<Catalog />} />
+        <Route path="/shop" element={<Shop />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/services" element={<Services />} />
         <Route path="/about" element={<About />} />

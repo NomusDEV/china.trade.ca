@@ -1,0 +1,96 @@
+{
+  "name": "Factory",
+  "type": "object",
+  "properties": {
+    "name_ru": {
+      "type": "string",
+      "description": "Factory name in Russian"
+    },
+    "name_tj": {
+      "type": "string",
+      "description": "Factory name in Tajik"
+    },
+    "type": {
+      "type": "string",
+      "description": "Product type the factory produces: household, clothing, shoes, smartphones, electronics, cosmetics, auto, toys, construction, other",
+      "enum": [
+        "household",
+        "clothing",
+        "shoes",
+        "smartphones",
+        "electronics",
+        "cosmetics",
+        "auto",
+        "toys",
+        "construction",
+        "other"
+      ]
+    },
+    "description_ru": {
+      "type": "string",
+      "description": "What the factory produces, in Russian"
+    },
+    "description_tj": {
+      "type": "string",
+      "description": "What the factory produces, in Tajik"
+    },
+    "country": {
+      "type": "string",
+      "description": "Country of the factory"
+    },
+    "city": {
+      "type": "string",
+      "description": "City of the factory"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Contact phone number"
+    },
+    "telegram": {
+      "type": "string",
+      "description": "Telegram username or link"
+    },
+    "whatsapp": {
+      "type": "string",
+      "description": "WhatsApp number or link"
+    },
+    "wechat": {
+      "type": "string",
+      "description": "WeChat ID"
+    },
+    "website": {
+      "type": "string",
+      "description": "Website URL"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "name_ru",
+    "type"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

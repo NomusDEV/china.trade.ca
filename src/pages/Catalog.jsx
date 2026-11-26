@@ -208,12 +208,12 @@ export default function Catalog() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/10 bg-transparent text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]"
+                  className="w-full px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#111111] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059] [color-scheme:light] dark:[color-scheme:dark]"
                 >
-                  <option value="newest">{t('catalogFilters.newest')}</option>
-                  <option value="oldest">{t('catalogFilters.oldest')}</option>
-                  <option value="priceLow">{t('catalogFilters.priceLow')}</option>
-                  <option value="priceHigh">{t('catalogFilters.priceHigh')}</option>
+                  <option className="bg-white dark:bg-[#111111] text-[#0A0A0A] dark:text-[#F9F9F9]" value="newest">{t('catalogFilters.newest')}</option>
+                  <option className="bg-white dark:bg-[#111111] text-[#0A0A0A] dark:text-[#F9F9F9]" value="oldest">{t('catalogFilters.oldest')}</option>
+                  <option className="bg-white dark:bg-[#111111] text-[#0A0A0A] dark:text-[#F9F9F9]" value="priceLow">{t('catalogFilters.priceLow')}</option>
+                  <option className="bg-white dark:bg-[#111111] text-[#0A0A0A] dark:text-[#F9F9F9]" value="priceHigh">{t('catalogFilters.priceHigh')}</option>
                 </select>
               </div>
               {/* Min price */}
