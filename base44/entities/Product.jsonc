@@ -22,6 +22,22 @@
       "type": "string",
       "description": "Product category"
     },
+    "type": {
+      "type": "string",
+      "description": "Product type: household, clothing, shoes, smartphones, electronics, cosmetics, auto, toys, construction, other",
+      "enum": [
+        "household",
+        "clothing",
+        "shoes",
+        "smartphones",
+        "electronics",
+        "cosmetics",
+        "auto",
+        "toys",
+        "construction",
+        "other"
+      ]
+    },
     "price": {
       "type": "number",
       "description": "Wholesale price in USD"

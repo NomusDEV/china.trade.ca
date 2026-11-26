@@ -17,11 +17,13 @@ export function CartProvider({ children }) {
   }, [items]);
 
   const addItem = (product, quantity = 1) => {
+    const qty = Math.max(1, Number(quantity) || 1);
+    const price = Number(product.price) || 0;
     setItems((prev) => {
       const existing = prev.find((i) => i.product_id === product.id);
       if (existing) {
         return prev.map((i) =>
-          i.product_id === product.id ? { ...i, quantity: i.quantity + quantity } : i
+          i.product_id === product.id ? { ...i, quantity: Number(i.quantity) + qty, price } : i
         );
       }
       return [
@@ -30,8 +32,8 @@ export function CartProvider({ children }) {
           product_id: product.id,
           name_ru: product.name_ru,
           name_tj: product.name_tj,
-          price: product.price,
-          quantity,
+          price,
+          quantity: qty,
           image: product.images?.[0] || null,
         },
       ];
@@ -43,19 +45,20 @@ export function CartProvider({ children }) {
   };
 
   const updateQuantity = (productId, quantity) => {
-    if (quantity <= 0) {
+    const qty = Number(quantity) || 0;
+    if (qty <= 0) {
       removeItem(productId);
       return;
     }
     setItems((prev) =>
-      prev.map((i) => (i.product_id === productId ? { ...i, quantity } : i))
+      prev.map((i) => (i.product_id === productId ? { ...i, quantity: qty } : i))
     );
   };
 
   const clearCart = () => setItems([]);
 
-  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const count = items.reduce((sum, i) => sum + i.quantity, 0);
+  const total = items.reduce((sum, i) => sum + (Number(i.price) || 0) * (Number(i.quantity) || 0), 0);
+  const count = items.reduce((sum, i) => sum + (Number(i.quantity) || 0), 0);
 
   return (
     <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, total, count }}>

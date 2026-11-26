@@ -21,7 +21,11 @@ export default function ProductDetail() {
 
   useEffect(() => {
     base44.entities.Product.get(id)
-      .then(setProduct)
+      .then((p) => {
+        setProduct(p);
+        const m = Number(p?.moq);
+        setQty(m > 0 && m <= 10000 ? m : 1);
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -47,6 +51,8 @@ export default function ProductDetail() {
   const getDesc = () => (lang === 'tj' && product.description_tj) ? product.description_tj : product.description_ru;
   const getSpecs = () => (lang === 'tj' && product.specifications_tj) ? product.specifications_tj : product.specifications_ru;
   const images = product.images?.length ? product.images : [];
+  const moq = Number(product.moq) > 0 && Number(product.moq) <= 10000 ? Number(product.moq) : 1;
+  const price = Number(product.price) || 0;
   const telegramMsg = encodeURIComponent(`Здравствуйте! Меня интересует товар: ${product.name_ru} (ID: ${product.id})`);
   const whatsappMsg = encodeURIComponent(`Здравствуйте! Меня интересует товар: ${product.name_ru} (ID: ${product.id})`);
   const telegramHref = telegramLink !== '#' ? `${telegramLink}?text=${telegramMsg}` : '#';
@@ -112,12 +118,12 @@ export default function ProductDetail() {
             <div className="flex items-baseline gap-4 mb-8 pb-8 border-b border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10">
               <div>
                 <p className="text-xs text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 mb-1">{t('product.price')}</p>
-                <span className="text-3xl font-bold text-[#E61D25]">${product.price}</span>
+                <span className="text-3xl font-bold text-[#E61D25]">${price.toFixed(2)}</span>
                 <span className="text-sm text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 ml-1">/ {t('product.units')}</span>
               </div>
               <div className="ml-auto text-right">
                 <p className="text-xs text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 mb-1">{t('product.moq')}</p>
-                <span className="text-2xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9]">{product.moq}</span>
+                <span className="text-2xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9]">{moq}</span>
                 <span className="text-sm text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 ml-1">{t('product.units')}</span>
               </div>
             </div>
@@ -138,22 +144,22 @@ export default function ProductDetail() {
 
             <div className="mb-6 p-5 rounded-2xl bg-[#F9F9F9] dark:bg-[#0A0A0A] border border-[#0A0A0A]/5 dark:border-[#F9F9F9]/5">
               <p className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 mb-3">
-                {t('product.quantity')} · {t('product.minOrder')}: {product.moq} {t('product.units')}
+                {t('product.quantity')} · {t('product.minOrder')}: {moq} {t('product.units')}
               </p>
               <div className="flex items-center gap-3 mb-4">
                 <button
-                  onClick={() => setQty(Math.max(product.moq || 1, qty - 1))}
+                  onClick={() => setQty(Math.max(moq, qty - 1))}
                   className="w-11 h-11 rounded-xl border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 flex items-center justify-center text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 hover:border-[#C5A059] transition-colors"
                 >
                   <Minus className="w-4 h-4" />
                 </button>
                 <input
                   type="number"
-                  min={product.moq || 1}
+                  min={moq}
                   value={qty}
                   onChange={(e) => {
                     const val = parseInt(e.target.value) || 0;
-                    setQty(Math.max(product.moq || 1, val));
+                    setQty(Math.max(moq, val));
                   }}
                   className="w-24 text-center text-xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9] bg-transparent border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 rounded-xl py-2 focus:outline-none focus:border-[#C5A059]"
                 />
@@ -165,7 +171,7 @@ export default function ProductDetail() {
                 </button>
                 <div className="ml-auto text-right">
                   <p className="text-xs text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('product.totalCost')}</p>
-                  <p className="text-2xl font-bold text-[#E61D25]">${(product.price * qty).toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-[#E61D25]">${(price * qty).toFixed(2)}</p>
                 </div>
               </div>
               <button

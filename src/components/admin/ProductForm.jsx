@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { Button } from '@/components/ui/button';
 import { X, Upload, Image } from 'lucide-react';
+import { PRODUCT_TYPES } from '@/lib/productTypes';
 
 export default function ProductForm({ product, categories, onSave, onCancel }) {
   const { lang } = useLanguage();
@@ -12,6 +13,7 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
     description_ru: product?.description_ru || '',
     description_tj: product?.description_tj || '',
     category: product?.category || '',
+    type: product?.type || '',
     price: product?.price || '',
     moq: product?.moq || '',
     specifications_ru: product?.specifications_ru || '',
@@ -71,7 +73,16 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div>
+            <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2">{fieldLabel('Тип товара', 'Навъи мол')}</label>
+            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} required className="w-full px-4 py-3 rounded-xl border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 bg-[#F9F9F9] dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]">
+              <option value="">—</option>
+              {PRODUCT_TYPES.map((tp) => (
+                <option key={tp.value} value={tp.value}>{lang === 'tj' ? tp.label_tj : tp.label_ru}</option>
+              ))}
+            </select>
+          </div>
           <div>
             <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2">{fieldLabel('Категория', 'Категория')}</label>
             <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required className="w-full px-4 py-3 rounded-xl border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 bg-[#F9F9F9] dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]">

@@ -29,6 +29,7 @@ export default function Cart() {
   const getName = (item) => (lang === 'tj' && item.name_tj ? item.name_tj : item.name_ru);
 
   const handleQtyChange = (productId, value) => {
+    if (value === '') return; // не удаляем товар, пока пользователь вводит число
     const qty = parseInt(value) || 0;
     if (qty <= 0) {
       removeItem(productId);
@@ -143,8 +144,12 @@ export default function Cart() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-sm text-[#0A0A0A] dark:text-[#F9F9F9] truncate">{getName(item)}</h3>
-                  <p className="text-sm text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50">${item.price} {t('product.units')}</p>
-                  <p className="text-sm font-bold text-[#E61D25] mt-1">${(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="text-sm text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50">
+                    ${(Number(item.price) || 0).toFixed(2)} / {t('product.units')} · × {Number(item.quantity) || 0}
+                  </p>
+                  <p className="text-sm font-bold text-[#E61D25] mt-1">
+                    ${((Number(item.price) || 0) * (Number(item.quantity) || 0)).toFixed(2)}
+                  </p>
                 </div>
                 <div className="flex items-center gap-1">
                   <button
@@ -188,7 +193,7 @@ export default function Cart() {
                 </div>
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70">{t('cart.grandTotal')}</span>
-                  <span className="text-3xl font-bold text-[#E61D25]">${total.toFixed(2)}</span>
+                  <span className="text-3xl font-bold text-[#E61D25]">${(Number(total) || 0).toFixed(2)}</span>
                 </div>
               </div>
 

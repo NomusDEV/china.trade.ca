@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
-import { Search, ShieldCheck, Package, ShoppingCart, LayoutGrid, List, SlidersHorizontal, X } from 'lucide-react';
+import { Search, ShieldCheck, Package, ShoppingCart, LayoutGrid, List, SlidersHorizontal, X, LayoutGrid as AllIcon } from 'lucide-react';
 import { useCart } from '@/lib/CartContext.jsx';
+import { PRODUCT_TYPES, getTypeLabel } from '@/lib/productTypes';
 
 export default function Catalog() {
   const { lang, t } = useLanguage();
@@ -13,6 +14,7 @@ export default function Catalog() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedType, setSelectedType] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [minPrice, setMinPrice] = useState('');
@@ -33,12 +35,19 @@ export default function Catalog() {
   const getName = (item) => (lang === 'tj' && item.name_tj) ? item.name_tj : item.name_ru;
   const getDesc = (item) => (lang === 'tj' && item.description_tj) ? item.description_tj : item.description_ru;
 
+  const typeCounts = products.reduce((acc, p) => {
+    const key = p.type || 'other';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+
   const filtered = products.filter((p) => {
     const matchesSearch = getName(p).toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = !selectedType || (p.type || 'other') === selectedType;
     const matchesCat = !selectedCategory || p.category === selectedCategory;
     const matchesMinPrice = !minPrice || p.price >= parseFloat(minPrice);
     const matchesMaxPrice = !maxPrice || p.price <= parseFloat(maxPrice);
-    return matchesSearch && matchesCat && matchesMinPrice && matchesMaxPrice;
+    return matchesSearch && matchesType && matchesCat && matchesMinPrice && matchesMaxPrice;
   });
 
   const sorted = [...filtered].sort((a, b) => {
@@ -57,6 +66,7 @@ export default function Catalog() {
   });
 
   const resetFilters = () => {
+    setSelectedType('');
     setSelectedCategory('');
     setSortBy('newest');
     setMinPrice('');
@@ -75,6 +85,47 @@ export default function Catalog() {
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9]">{t('catalog.title')}</h1>
         </motion.div>
+
+        {/* Product types — choose first */}
+        <div className="mb-6">
+          <p className="text-xs font-semibold text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 uppercase tracking-widest mb-3">
+            {lang === 'ru' ? 'Тип товара' : 'Навъи мол'}
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+            <button
+              onClick={() => setSelectedType('')}
+              className={`flex items-center gap-2.5 px-3 py-3 rounded-xl text-left transition-all border ${
+                !selectedType
+                  ? 'bg-[#E61D25] text-white border-[#E61D25] shadow-lg shadow-[#E61D25]/20'
+                  : 'bg-white dark:bg-[#111111] text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 border-[#0A0A0A]/5 dark:border-[#F9F9F9]/5 hover:border-[#C5A059]'
+              }`}
+            >
+              <AllIcon className="w-4 h-4 flex-shrink-0" />
+              <span className="text-xs font-semibold truncate">{lang === 'ru' ? 'Все товары' : 'Ҳамаи молҳо'}</span>
+              <span className={`ml-auto text-[10px] font-bold ${!selectedType ? 'text-white/70' : 'text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30'}`}>{products.length}</span>
+            </button>
+            {PRODUCT_TYPES.map((type) => {
+              const Icon = type.Icon;
+              const count = typeCounts[type.value] || 0;
+              const active = selectedType === type.value;
+              return (
+                <button
+                  key={type.value}
+                  onClick={() => setSelectedType(active ? '' : type.value)}
+                  className={`flex items-center gap-2.5 px-3 py-3 rounded-xl text-left transition-all border ${
+                    active
+                      ? 'bg-[#E61D25] text-white border-[#E61D25] shadow-lg shadow-[#E61D25]/20'
+                      : 'bg-white dark:bg-[#111111] text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 border-[#0A0A0A]/5 dark:border-[#F9F9F9]/5 hover:border-[#C5A059]'
+                  } ${count === 0 ? 'opacity-50' : ''}`}
+                >
+                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-xs font-semibold truncate">{getTypeLabel(type.value, lang)}</span>
+                  <span className={`ml-auto text-[10px] font-bold ${active ? 'text-white/70' : 'text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30'}`}>{count}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Search + View toggle */}
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -234,7 +285,7 @@ export default function Catalog() {
                       <span className="text-[9px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">MOQ: {product.moq}</span>
                     </div>
                     <button
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); addItem(product, Math.max(product.moq || 1, 1)); }}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); addItem(product, 1); }}
                       className="w-full py-1.5 bg-[#E61D25] text-white text-[11px] font-semibold rounded-lg hover:bg-[#E61D25]/90 transition-colors flex items-center justify-center gap-1"
                     >
                       <ShoppingCart className="w-3 h-3" /> {t('cart.addToCart')}
@@ -269,7 +320,7 @@ export default function Catalog() {
                         <span className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">/ {t('catalog.perUnit')} · MOQ: {product.moq}</span>
                       </div>
                       <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); addItem(product, Math.max(product.moq || 1, 1)); }}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); addItem(product, 1); }}
                         className="px-4 py-2 bg-[#E61D25] text-white text-xs font-semibold rounded-lg hover:bg-[#E61D25]/90 transition-colors flex items-center gap-1.5"
                       >
                         <ShoppingCart className="w-3.5 h-3.5" /> {t('cart.addToCart')}
