@@ -59,6 +59,10 @@
     "notes": {
       "type": "string",
       "description": "Order notes"
+    },
+    "cancel_reason": {
+      "type": "string",
+      "description": "Reason why the order was cancelled by the admin"
     }
   },
   "required": [

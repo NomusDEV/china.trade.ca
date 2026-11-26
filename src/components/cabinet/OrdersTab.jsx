@@ -65,7 +65,11 @@ export default function OrdersTab({ orders, loading, lang, t }) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.03 }}
-                className="p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5"
+                className={`p-4 rounded-xl border ${
+                  order.status === 'cancelled'
+                    ? 'bg-red-500/[0.07] border-red-500/40'
+                    : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/5 dark:border-white/5'
+                }`}
               >
                 <div className="flex items-start justify-between mb-2 gap-3">
                   <div className="min-w-0">
@@ -102,6 +106,19 @@ export default function OrdersTab({ orders, loading, lang, t }) {
                   </span>
                   <span className="text-lg font-bold text-[#E61D25]">${(Number(order.total) || 0).toFixed(2)}</span>
                 </div>
+
+                {order.status === 'cancelled' && (
+                  <div className="mt-3 pt-3 border-t border-red-500/25">
+                    <p className="text-xs font-semibold text-red-500">
+                      {lang === 'ru' ? 'Извините, этот заказ был отменён' : 'Бубахшед, ин фармоиш бекор карда шуд'}
+                    </p>
+                    {order.cancel_reason && (
+                      <p className="text-xs text-red-500/80 mt-1">
+                        {lang === 'ru' ? 'Причина' : 'Сабаб'}: {order.cancel_reason}
+                      </p>
+                    )}
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>

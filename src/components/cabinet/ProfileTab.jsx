@@ -1,9 +1,32 @@
-import React from 'react';
-import { User, Mail, Phone, MapPin, Camera, Save, CheckCircle, Shield } from 'lucide-react';
+import React, { useState } from 'react';
+import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { User, Mail, Phone, MapPin, Camera, Save, CheckCircle, Shield, Trash2 } from 'lucide-react';
 import AvatarUpload from '@/components/AvatarUpload';
 import PhoneVerification from '@/components/PhoneVerification';
 
 export default function ProfileTab({ user, lang, t, country, profile, setProfile, onSave, saving, saved, roleBadge, onVerified }) {
+  const { checkUserAuth } = useAuth();
+  const [removingAvatar, setRemovingAvatar] = useState(false);
+
+  const removeAvatar = async () => {
+    setRemovingAvatar(true);
+    try {
+      await base44.auth.updateMe({ avatar: '' });
+      setProfile({ ...profile, avatar: '' });
+      try {
+        await Promise.all([
+          base44.entities.Comment.updateMany({ user_id: user.id }, { $set: { user_avatar: '' } }),
+          base44.entities.Message.updateMany({ sender_id: user.id }, { $set: { sender_avatar: '' } }),
+          base44.entities.Presence.updateMany({ user_id: user.id }, { $set: { user_avatar: '' } }),
+        ]);
+      } catch (e) {}
+      await checkUserAuth();
+    } finally {
+      setRemovingAvatar(false);
+    }
+  };
+
   const infoRows = [
     { Icon: User, label: t('cabinet.fullName'), value: user?.full_name || '—' },
     { Icon: Mail, label: t('cabinet.email'), value: user?.email || '—' },
@@ -47,6 +70,17 @@ export default function ProfileTab({ user, lang, t, country, profile, setProfile
             <p className="text-xs text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 mt-2 flex items-center gap-1">
               <Camera className="w-3 h-3" /> {t('cabinet.avatar')}
             </p>
+            {profile.avatar && (
+              <button
+                type="button"
+                onClick={removeAvatar}
+                disabled={removingAvatar}
+                className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-medium text-red-500 hover:underline disabled:opacity-50"
+              >
+                <Trash2 className="w-3 h-3" />
+                {lang === 'ru' ? 'Удалить фото' : 'Нест кардани сурат'}
+              </button>
+            )}
           </div>
 
           <div>

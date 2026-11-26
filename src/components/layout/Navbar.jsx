@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useCart } from '@/lib/CartContext.jsx';
 import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
 import { useUnreadMessages } from '@/lib/useUnreadMessages';
+import { useNewOrders } from '@/lib/useNewOrders';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
@@ -16,6 +17,7 @@ export default function Navbar() {
   const { count: cartCount } = useCart();
   const { settings } = useSiteSettings();
   const unreadCount = useUnreadMessages();
+  const newOrders = useNewOrders();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const menuRef = useRef(null);
@@ -150,6 +152,18 @@ export default function Navbar() {
                     </p>
                   </div>
 
+                  {user?.role === 'admin' && newOrders > 0 && (
+                    <Link
+                      to="/admin"
+                      className="mx-2 mt-2 flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[#E61D25]/10 text-[#E61D25] text-xs font-semibold hover:bg-[#E61D25]/15 transition-colors"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      {lang === 'ru'
+                        ? `Новый заказ · ${newOrders}`
+                        : `Фармоиши нав · ${newOrders}`}
+                    </Link>
+                  )}
+
                   {/* Nav links */}
                   <div className="p-2">
                     {navLinks.map((link) => {
@@ -190,6 +204,11 @@ export default function Navbar() {
                         className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-[#C5A059] hover:bg-[#C5A059]/10 transition-all"
                       >
                         <Package className="w-4 h-4" /> {t('nav.admin')}
+                        {newOrders > 0 && (
+                          <span className="ml-auto min-w-[18px] h-[18px] px-1 bg-[#E61D25] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                            {newOrders > 9 ? '9+' : newOrders}
+                          </span>
+                        )}
                       </Link>
                     )}
                   </div>

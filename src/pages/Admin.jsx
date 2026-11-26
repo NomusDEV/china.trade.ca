@@ -38,6 +38,7 @@ export default function Admin() {
   const [categories, setCategories] = useState([]);
   const [inquiries, setInquiries] = useState([]);
   const [orders, setOrders] = useState([]);
+  const pendingOrders = orders.filter((o) => o.status === 'pending').length;
   const [loading, setLoading] = useState(true);
   const [editingProduct, setEditingProduct] = useState(null);
   const [showProductForm, setShowProductForm] = useState(false);
@@ -114,6 +115,11 @@ export default function Admin() {
                 {tab.key === 'messages' && unreadCount > 0 && (
                   <span className="ml-1 min-w-[18px] h-[18px] px-1 bg-[#E61D25] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                     {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+                {tab.key === 'orders' && pendingOrders > 0 && (
+                  <span className="ml-1 min-w-[18px] h-[18px] px-1 bg-[#E61D25] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {pendingOrders > 9 ? '9+' : pendingOrders}
                   </span>
                 )}
               </button>
