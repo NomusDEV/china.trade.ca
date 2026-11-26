@@ -38,6 +38,18 @@
     "avatar": {
       "type": "string",
       "description": "User avatar image URL"
+    },
+    "subscription_active": {
+      "type": "boolean",
+      "description": "Whether the user has an active subscription for factory contacts (set by admin)",
+      "default": false,
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
     }
   },
   "required": [

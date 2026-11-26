@@ -62,6 +62,11 @@
       "type": "string",
       "description": "Website URL"
     },
+    "requires_subscription": {
+      "type": "boolean",
+      "description": "If true, contacts are only visible to subscribed users",
+      "default": false
+    },
     "status": {
       "type": "string",
       "enum": [

@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { useAuth } from '@/lib/AuthContext';
 import { motion } from 'framer-motion';
-import { Star, MessageSquare, Reply, Send, Loader2, MessageCircle } from 'lucide-react';
+import { Star, MessageSquare, Reply, Send, Loader2, MessageCircle, Pencil, Trash2, Check, X } from 'lucide-react';
 
 function StarRating({ value = 0, onChange, size = 'sm' }) {
   const [hover, setHover] = useState(0);
@@ -34,13 +34,24 @@ function StarRating({ value = 0, onChange, size = 'sm' }) {
   );
 }
 
-function CommentItem({ comment, replies, productId, onReply, lang, t, depth = 0 }) {
+function CommentItem({ comment, replies, productId, onReply, onEdit, onDelete, currentUser, lang, t, depth = 0 }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editText, setEditText] = useState(comment.text || '');
+  const [editRating, setEditRating] = useState(comment.rating || 0);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const date = new Date(comment.created_date).toLocaleDateString(lang === 'tj' ? 'tg-TJ' : 'ru-RU', {
     day: 'numeric', month: 'short', year: 'numeric',
   });
+
+  const canManage = !!currentUser && (
+    currentUser.id === comment.user_id ||
+    currentUser.id === comment.created_by_id ||
+    currentUser.role === 'admin'
+  );
 
   const handleReply = async (e) => {
     e.preventDefault();
@@ -52,12 +63,22 @@ function CommentItem({ comment, replies, productId, onReply, lang, t, depth = 0 
     setSubmitting(false);
   };
 
+  const handleSaveEdit = async () => {
+    if (!editText.trim()) return;
+    setSavingEdit(true);
+    const payload = { text: editText.trim() };
+    if (comment.rating > 0) payload.rating = editRating;
+    await onEdit(comment.id, payload);
+    setSavingEdit(false);
+    setEditing(false);
+  };
+
   return (
     <div className={`flex gap-3 ${depth > 0 ? 'ml-8 sm:ml-12' : ''}`}>
       {/* Avatar */}
       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#E61D25] to-[#C5A059] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
         {comment.user_avatar ? (
-          <img src={comment.user_avatar} alt="" className="w-full h-full object-cover" />
+          <img src={comment.user_avatar} alt={comment.user_name || ''} className="w-full h-full object-cover" />
         ) : (
           (comment.user_name || '?').charAt(0).toUpperCase()
         )}
@@ -65,44 +86,125 @@ function CommentItem({ comment, replies, productId, onReply, lang, t, depth = 0 
 
       <div className="flex-1 min-w-0">
         <div className="rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] p-3 sm:p-4">
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9]">{comment.user_name || (lang === 'ru' ? 'Аноним' : 'Аноним')}</span>
-            <span className="text-xs text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30">{date}</span>
-          </div>
-          {comment.rating > 0 && (
-            <div className="mb-2">
-              <StarRating value={comment.rating} />
+          <div className="flex items-start gap-2 mb-1.5">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] truncate">{comment.user_name || (lang === 'ru' ? 'Аноним' : 'Аноним')}</span>
+              <span className="text-xs text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 flex-shrink-0">{date}</span>
             </div>
+            {canManage && !editing && (
+              <div className="flex items-center gap-1 ml-auto flex-shrink-0">
+                <button
+                  onClick={() => { setEditing(true); setEditText(comment.text || ''); setEditRating(comment.rating || 0); }}
+                  title={lang === 'ru' ? 'Редактировать' : 'Таҳрир кардан'}
+                  className="p-1.5 rounded-lg text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 hover:text-[#C5A059] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setConfirmDelete(true)}
+                  title={lang === 'ru' ? 'Удалить' : 'Нест кардан'}
+                  className="p-1.5 rounded-lg text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 hover:text-[#E61D25] hover:bg-[#E61D25]/5 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {editing ? (
+            <div>
+              {comment.rating > 0 && (
+                <div className="mb-2">
+                  <StarRating value={editRating} onChange={setEditRating} />
+                </div>
+              )}
+              <textarea
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-[#111111] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059] resize-none"
+              />
+              <div className="flex items-center gap-2 mt-2">
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={savingEdit || !editText.trim()}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#C5A059] text-white rounded-lg text-xs font-semibold disabled:opacity-50"
+                >
+                  {savingEdit ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                  {lang === 'ru' ? 'Сохранить' : 'Нигоҳ доштан'}
+                </button>
+                <button
+                  onClick={() => setEditing(false)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 hover:text-[#0A0A0A] dark:hover:text-[#F9F9F9]"
+                >
+                  <X className="w-3.5 h-3.5" /> {lang === 'ru' ? 'Отмена' : 'Бекор'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {comment.rating > 0 && (
+                <div className="mb-2">
+                  <StarRating value={comment.rating} />
+                </div>
+              )}
+              <p className="text-sm text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 leading-relaxed whitespace-pre-wrap break-words">{comment.text}</p>
+            </>
           )}
-          <p className="text-sm text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 leading-relaxed whitespace-pre-wrap break-words">{comment.text}</p>
         </div>
 
-        <button
-          onClick={() => setShowReplyForm(!showReplyForm)}
-          className="flex items-center gap-1.5 mt-1.5 ml-2 text-xs text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#C5A059] transition-colors"
-        >
-          <Reply className="w-3.5 h-3.5" /> {t('comments.reply')}
-        </button>
+        {confirmDelete ? (
+          <div className="flex items-center gap-3 mt-2 ml-2">
+            <span className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50">
+              {lang === 'ru' ? 'Удалить навсегда?' : 'Тамоман нест кунам?'}
+            </span>
+            <button onClick={() => onDelete(comment)} className="text-xs font-semibold text-[#E61D25] hover:underline">
+              {lang === 'ru' ? 'Удалить' : 'Нест кардан'}
+            </button>
+            <button onClick={() => setConfirmDelete(false)} className="text-xs text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:underline">
+              {lang === 'ru' ? 'Отмена' : 'Бекор'}
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowReplyForm(!showReplyForm)}
+            className="flex items-center gap-1.5 mt-1.5 ml-2 text-xs text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#C5A059] transition-colors"
+          >
+            <Reply className="w-3.5 h-3.5" /> {t('comments.reply')}
+          </button>
+        )}
 
         {showReplyForm && (
-            <form onSubmit={handleReply} className="mt-2 ml-2 flex gap-2">
-              <input
-                type="text"
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                placeholder={t('comments.writeReply')}
-                className="flex-1 px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]"
-              />
-              <button type="submit" disabled={submitting || !replyText.trim()} className="px-3 py-2 bg-[#C5A059] text-white rounded-lg text-sm disabled:opacity-50">
-                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              </button>
-            </form>
-          )}
+          <form onSubmit={handleReply} className="mt-2 ml-2 flex gap-2">
+            <input
+              type="text"
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder={t('comments.writeReply')}
+              className="flex-1 px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]"
+            />
+            <button type="submit" disabled={submitting || !replyText.trim()} className="px-3 py-2 bg-[#C5A059] text-white rounded-lg text-sm disabled:opacity-50">
+              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            </button>
+          </form>
+        )}
 
         {replies?.length > 0 && (
           <div className="mt-3 space-y-3">
             {replies.map((reply) => (
-              <CommentItem key={reply.id} comment={reply} replies={[]} productId={productId} onReply={onReply} lang={lang} t={t} depth={depth + 1} />
+              <CommentItem
+                key={reply.id}
+                comment={reply}
+                replies={[]}
+                productId={productId}
+                onReply={onReply}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                currentUser={currentUser}
+                lang={lang}
+                t={t}
+                depth={depth + 1}
+              />
             ))}
           </div>
         )}
@@ -120,6 +222,8 @@ export default function ProductComments({ productId }) {
   const [rating, setRating] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('reviews'); // reviews | comments
+  const [ratingFilter, setRatingFilter] = useState(0);
+  const [sortBy, setSortBy] = useState('newest');
 
   useEffect(() => {
     loadComments();
@@ -167,13 +271,40 @@ export default function ProductComments({ productId }) {
     loadComments();
   };
 
+  const handleEdit = async (id, payload) => {
+    await base44.entities.Comment.update(id, payload);
+    loadComments();
+  };
+
+  const handleDelete = async (comment) => {
+    const children = comments.filter((c) => c.parent_id === comment.id);
+    for (const child of children) {
+      await base44.entities.Comment.delete(child.id);
+    }
+    await base44.entities.Comment.delete(comment.id);
+    loadComments();
+  };
+
   // Top-level comments only (no parent_id)
   const topLevel = comments.filter((c) => !c.parent_id);
   const reviews = topLevel.filter((c) => c.type === 'review' || c.rating > 0);
   const plainComments = topLevel.filter((c) => c.type === 'comment' || (c.type !== 'review' && c.rating === 0));
 
-  const displayed = activeTab === 'reviews' ? reviews : plainComments;
+  let displayed = activeTab === 'reviews' ? reviews : plainComments;
+  if (activeTab === 'reviews' && ratingFilter > 0) {
+    displayed = displayed.filter((c) => Math.round(c.rating || 0) === ratingFilter);
+  }
+  displayed = [...displayed].sort((a, b) => {
+    if (sortBy === 'highest') return (b.rating || 0) - (a.rating || 0);
+    if (sortBy === 'lowest') return (a.rating || 0) - (b.rating || 0);
+    return new Date(b.created_date) - new Date(a.created_date);
+  });
+
   const avgRating = reviews.length > 0 ? (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length) : 0;
+  const ratingCounts = [5, 4, 3, 2, 1].map((star) => ({
+    star,
+    count: reviews.filter((r) => Math.round(r.rating || 0) === star).length,
+  }));
 
   const getReplies = (commentId) => comments.filter((c) => c.parent_id === commentId);
 
@@ -194,7 +325,7 @@ export default function ProductComments({ productId }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-4">
         <button
           onClick={() => setActiveTab('reviews')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
@@ -211,6 +342,47 @@ export default function ProductComments({ productId }) {
         >
           <MessageCircle className="w-4 h-4" /> {t('comments.comments')} ({plainComments.length})
         </button>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        {activeTab === 'reviews' && (
+          <>
+            <button
+              onClick={() => setRatingFilter(0)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                ratingFilter === 0
+                  ? 'bg-[#C5A059] text-white'
+                  : 'bg-black/5 dark:bg-white/5 text-[#0A0A0A]/55 dark:text-[#F9F9F9]/55 hover:bg-black/10'
+              }`}
+            >
+              {lang === 'ru' ? 'Все оценки' : 'Ҳамаи баҳоҳо'} ({reviews.length})
+            </button>
+            {ratingCounts.map(({ star, count }) => (
+              <button
+                key={star}
+                onClick={() => setRatingFilter(star)}
+                disabled={count === 0}
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-40 ${
+                  ratingFilter === star
+                    ? 'bg-[#C5A059] text-white'
+                    : 'bg-black/5 dark:bg-white/5 text-[#0A0A0A]/55 dark:text-[#F9F9F9]/55 hover:bg-black/10'
+                }`}
+              >
+                {star} <Star className={`w-3 h-3 ${ratingFilter === star ? 'fill-white text-white' : 'fill-[#C5A059] text-[#C5A059]'}`} /> ({count})
+              </button>
+            ))}
+          </>
+        )}
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="ml-auto px-3 py-1.5 rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-[#111111] text-[#0A0A0A] dark:text-[#F9F9F9] text-xs focus:outline-none focus:border-[#C5A059] [color-scheme:light] dark:[color-scheme:dark]"
+        >
+          <option className="bg-white dark:bg-[#111111] text-[#0A0A0A] dark:text-[#F9F9F9]" value="newest">{lang === 'ru' ? 'Сначала новые' : 'Аввал нав'}</option>
+          <option className="bg-white dark:bg-[#111111] text-[#0A0A0A] dark:text-[#F9F9F9]" value="highest">{lang === 'ru' ? 'Высокий рейтинг' : 'Баҳои баланд'}</option>
+          <option className="bg-white dark:bg-[#111111] text-[#0A0A0A] dark:text-[#F9F9F9]" value="lowest">{lang === 'ru' ? 'Низкий рейтинг' : 'Баҳои паст'}</option>
+        </select>
       </div>
 
       {/* Write form */}
@@ -262,7 +434,11 @@ export default function ProductComments({ productId }) {
       ) : displayed.length === 0 ? (
         <div className="text-center py-12">
           <MessageSquare className="w-12 h-12 mx-auto text-[#0A0A0A]/15 dark:text-[#F9F9F9]/15 mb-3" />
-          <p className="text-sm text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{t('comments.empty')}</p>
+          <p className="text-sm text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">
+            {ratingFilter > 0
+              ? (lang === 'ru' ? 'Отзывов с такой оценкой нет' : 'Шарҳҳо бо ин баҳо нест')
+              : t('comments.empty')}
+          </p>
         </div>
       ) : (
         <div className="space-y-5">
@@ -278,6 +454,9 @@ export default function ProductComments({ productId }) {
                 replies={getReplies(comment.id)}
                 productId={productId}
                 onReply={handleReply}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                currentUser={user}
                 lang={lang}
                 t={t}
               />

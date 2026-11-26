@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, User, Mail, Phone, MapPin, ShoppingBag, DollarSign, Calendar, ArrowLeft, Send, MessageSquare, CheckCircle, Loader2 } from 'lucide-react';
+import { Search, User, Mail, Phone, MapPin, ShoppingBag, DollarSign, Calendar, ArrowLeft, Send, MessageSquare, CheckCircle, Loader2, Crown } from 'lucide-react';
 
 export default function ClientManager() {
   const { lang } = useLanguage();
@@ -128,6 +128,11 @@ export default function ClientManager() {
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-sm text-[#0A0A0A] dark:text-[#F9F9F9] truncate">{u.full_name || u.email}</p>
                   {u.phone_verified && <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />}
+                  {u.subscription_active && (
+                    <span className="px-1.5 py-0.5 rounded bg-[#C5A059]/15 text-[#C5A059] text-[9px] font-bold flex-shrink-0">
+                      {lang === 'ru' ? 'ПОДПИСКА' : 'ОБУНА'}
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 truncate">{u.email} · {u.phone || (lang === 'ru' ? 'нет телефона' : 'телефон нест')}</p>
                 <p className="text-[10px] text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30 mt-0.5">
@@ -166,7 +171,19 @@ export default function ClientManager() {
 function ClientDetail({ user, orders, messages, onBack, onMessagesUpdate, lang }) {
   const [replyText, setReplyText] = useState('');
   const [sending, setSending] = useState(false);
+  const [subscribed, setSubscribed] = useState(!!user.subscription_active);
+  const [savingSub, setSavingSub] = useState(false);
   const messagesEndRef = useRef(null);
+
+  const toggleSubscription = async () => {
+    setSavingSub(true);
+    try {
+      const next = !subscribed;
+      await base44.entities.User.update(user.id, { subscription_active: next });
+      setSubscribed(next);
+    } catch (e) {}
+    setSavingSub(false);
+  };
 
   const totalSpent = orders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + (o.total || 0), 0);
   const totalUnits = orders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + (o.items?.reduce((si, i) => si + (i.quantity || 0), 0) || 0), 0);
@@ -252,6 +269,37 @@ function ClientDetail({ user, orders, messages, onBack, onMessagesUpdate, lang }
             <p className="text-xl font-bold text-[#E61D25]">${totalSpent.toFixed(0)}</p>
             <p className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{lang === 'ru' ? 'Потратил' : 'Харҷ'}</p>
           </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-3 mt-4 p-4 rounded-xl border border-[#C5A059]/20 bg-[#C5A059]/5">
+          <div className="flex items-center gap-2 min-w-0">
+            <Crown className="w-4 h-4 text-[#C5A059] flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-[#0A0A0A] dark:text-[#F9F9F9]">
+                {lang === 'ru' ? 'Подписка на контакты заводов' : 'Обуна ба тамосҳои заводҳо'}
+              </p>
+              <p className="text-[10px] text-[#0A0A0A]/45 dark:text-[#F9F9F9]/45">
+                {subscribed
+                  ? (lang === 'ru' ? 'Активна — клиент видит закрытые контакты' : 'Фаъол — муштарӣ тамосҳои пӯшидаро мебинад')
+                  : (lang === 'ru' ? 'Не активна' : 'Ғайрифаъол')}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={toggleSubscription}
+            disabled={savingSub}
+            className={`flex-shrink-0 px-4 py-2 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 ${
+              subscribed
+                ? 'bg-black/5 dark:bg-white/10 text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:bg-black/10'
+                : 'bg-[#C5A059] text-white hover:bg-[#C5A059]/90'
+            }`}
+          >
+            {savingSub
+              ? <Loader2 className="w-4 h-4 animate-spin" />
+              : (subscribed
+                ? (lang === 'ru' ? 'Отключить' : 'Хомӯш кардан')
+                : (lang === 'ru' ? 'Активировать' : 'Фаъол кардан'))}
+          </button>
         </div>
       </div>
 

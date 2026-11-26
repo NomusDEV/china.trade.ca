@@ -8,7 +8,7 @@ import { PRODUCT_TYPES, getTypeLabel } from '@/lib/productTypes';
 const emptyForm = {
   name_ru: '', name_tj: '', type: '', country: '', city: '',
   phone: '', telegram: '', whatsapp: '', wechat: '', website: '',
-  description_ru: '', description_tj: '', status: 'active',
+  description_ru: '', description_tj: '', status: 'active', requires_subscription: false,
 };
 
 export default function FactoryManager() {
@@ -161,6 +161,18 @@ export default function FactoryManager() {
             </div>
           </div>
 
+          <label className="flex items-center gap-3 mt-5 p-4 rounded-xl bg-[#C5A059]/5 border border-[#C5A059]/20 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={!!form.requires_subscription}
+              onChange={(e) => setForm({ ...form, requires_subscription: e.target.checked })}
+              className="w-4 h-4 accent-[#C5A059]"
+            />
+            <span className="text-sm text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70">
+              {lang === 'ru' ? 'Контакты доступны только по подписке' : 'Тамосҳо танҳо бо обуна дастрасанд'}
+            </span>
+          </label>
+
           <div className="flex gap-3 pt-5">
             <Button type="submit" disabled={saving} className="bg-[#E61D25] hover:bg-[#E61D25]/90 text-white">
               <Save className="w-4 h-4 mr-2" />
@@ -200,6 +212,11 @@ export default function FactoryManager() {
                   {factory.phone ? ` · ${factory.phone}` : ''}
                 </p>
               </div>
+              {factory.requires_subscription && (
+                <span className="px-2 py-1 rounded text-[10px] font-medium bg-[#C5A059]/10 text-[#C5A059]">
+                  {lang === 'ru' ? 'Подписка' : 'Обуна'}
+                </span>
+              )}
               <div className={`px-2 py-1 rounded text-[10px] font-medium ${factory.status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
                 {factory.status}
               </div>
