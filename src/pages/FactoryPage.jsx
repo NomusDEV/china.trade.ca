@@ -13,6 +13,7 @@ import { telegramHref, whatsappHref } from '@/lib/factoryLinks';
 import BackButton from '@/components/layout/BackButton';
 import ContactIcon from '@/components/ContactIcon';
 import FactoryComments from '@/components/shop/FactoryComments';
+import MediaGallery from '@/components/media/MediaGallery';
 
 function ContactRow({ type, label, value, href }) {
   const content = (
@@ -103,15 +104,13 @@ export default function FactoryPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10">
           {/* Photo */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            {factory.image ? (
-              <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5">
-                <img src={factory.image} alt={name} className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-[#C5A059]/20 to-[#E61D25]/10 flex items-center justify-center">
-                <TypeIcon className="w-16 h-16 text-[#C5A059]" />
-              </div>
-            )}
+            <MediaGallery
+              images={factory.images?.length ? factory.images : (factory.image ? [factory.image] : [])}
+              videos={factory.videos || []}
+              alt={name}
+              aspect="aspect-[4/3]"
+              fallbackIcon={TypeIcon}
+            />
           </motion.div>
 
           {/* Main info */}

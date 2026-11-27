@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { Button } from '@/components/ui/button';
-import { X, Upload, Image, Sparkles, Loader2 } from 'lucide-react';
+import { X, Upload, Image, Sparkles, Loader2, Video } from 'lucide-react';
 import { PRODUCT_TYPES } from '@/lib/productTypes';
 
 export default function ProductForm({ product, categories, onSave, onCancel }) {
@@ -19,11 +19,13 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
     specifications_ru: product?.specifications_ru || '',
     specifications_tj: product?.specifications_tj || '',
     images: product?.images || [],
+    videos: product?.videos || [],
     status: product?.status || 'active',
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
 
   const generateImage = async () => {
     setGeneratingImage(true);
@@ -37,16 +39,39 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
     setUploading(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    setForm({ ...form, images: [...form.images, file_url] });
+    const urls = [];
+    for (const file of files) {
+      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+      urls.push(file_url);
+    }
+    setForm((prev) => ({ ...prev, images: [...prev.images, ...urls] }));
     setUploading(false);
+    e.target.value = '';
+  };
+
+  const handleVideoUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setUploadingVideo(true);
+    const urls = [];
+    for (const file of files) {
+      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+      urls.push(file_url);
+    }
+    setForm((prev) => ({ ...prev, videos: [...prev.videos, ...urls] }));
+    setUploadingVideo(false);
+    e.target.value = '';
   };
 
   const removeImage = (idx) => {
     setForm({ ...form, images: form.images.filter((_, i) => i !== idx) });
+  };
+
+  const removeVideo = (idx) => {
+    setForm({ ...form, videos: form.videos.filter((_, i) => i !== idx) });
   };
 
   const handleSubmit = async (e) => {
@@ -143,7 +168,7 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
           </select>
         </div>
 
-        {/* Images */}
+        {/* Media */}
         <div>
           <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2">{fieldLabel('Фотографии', 'Суратҳо')}</label>
           <div className="flex flex-wrap gap-3 mb-3">
@@ -161,7 +186,7 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
               ) : (
                 <Upload className="w-5 h-5 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30" />
               )}
-              <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+              <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
             </label>
             <button
               type="button"
@@ -172,6 +197,27 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
               {generatingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {lang === 'ru' ? 'Сгенерировать' : 'Сохтан'}
             </button>
+          </div>
+
+          <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2 mt-4">{fieldLabel('Видео', 'Видео')}</label>
+          <div className="flex flex-wrap gap-3">
+            {form.videos.map((video, i) => (
+              <div key={i} className="relative w-32 h-20 rounded-lg overflow-hidden group bg-black">
+                <video src={video} muted playsInline preload="metadata" className="w-full h-full object-cover" />
+                <button type="button" onClick={() => removeVideo(i)} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                  <X className="w-4 h-4 text-white" />
+                </button>
+              </div>
+            ))}
+            <label className="w-32 h-20 rounded-lg border-2 border-dashed border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-[#C5A059] transition-colors">
+              {uploadingVideo ? (
+                <div className="w-5 h-5 border-2 border-[#E61D25]/20 border-t-[#E61D25] rounded-full animate-spin" />
+              ) : (
+                <Video className="w-5 h-5 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30" />
+              )}
+              <span className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{lang === 'ru' ? 'Видео' : 'Видео'}</span>
+              <input type="file" accept="video/*" multiple onChange={handleVideoUpload} className="hidden" />
+            </label>
           </div>
         </div>
 

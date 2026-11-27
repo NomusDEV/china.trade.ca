@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MessageCircle, Package, ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Package, ShoppingCart, Plus, Minus } from 'lucide-react';
+import MediaGallery from '@/components/media/MediaGallery';
 import { useCart } from '@/lib/CartContext.jsx';
 import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
 import ProductComments from '@/components/product/ProductComments';
@@ -16,7 +17,6 @@ export default function ProductDetail() {
   const { telegramLink, whatsappLink } = useSiteSettings();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeImage, setActiveImage] = useState(0);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -67,46 +67,7 @@ export default function ProductDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Gallery */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-[#F0F0F0] dark:bg-[#111111] mb-4">
-              {images.length > 0 ? (
-                <img src={images[activeImage]} alt={getName()} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Package className="w-20 h-20 text-[#0A0A0A]/10 dark:text-[#F9F9F9]/10" />
-                </div>
-              )}
-              {images.length > 1 && (
-                <>
-                  <button
-                    onClick={() => setActiveImage((activeImage - 1 + images.length) % images.length)}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => setActiveImage((activeImage + 1) % images.length)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </>
-              )}
-            </div>
-            {images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto">
-                {images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveImage(i)}
-                    className={`w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all ${
-                      i === activeImage ? 'border-[#E61D25]' : 'border-transparent opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
+            <MediaGallery images={images} videos={product.videos || []} alt={getName()} />
           </motion.div>
 
           {/* Info */}

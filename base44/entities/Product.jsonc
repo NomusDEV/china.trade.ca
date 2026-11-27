@@ -61,6 +61,13 @@
       },
       "description": "Array of product image URLs"
     },
+    "videos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of product video URLs"
+    },
     "status": {
       "type": "string",
       "enum": [

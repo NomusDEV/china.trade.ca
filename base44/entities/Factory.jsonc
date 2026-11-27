@@ -112,7 +112,21 @@
     },
     "image": {
       "type": "string",
-      "description": "Factory photo or logo URL"
+      "description": "Main factory photo or logo URL"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of factory photo URLs"
+    },
+    "videos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of factory video URLs"
     },
     "requires_subscription": {
       "type": "boolean",

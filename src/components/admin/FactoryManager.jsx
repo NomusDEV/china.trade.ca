@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
-import { Plus, Pencil, Trash2, Factory, X, Save, Upload, Sparkles, Loader2, ChevronDown, Settings2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Factory, X, Save, Upload, Sparkles, Loader2, ChevronDown, Settings2, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PRODUCT_TYPES, getTypeLabel } from '@/lib/productTypes';
 
 const emptyForm = {
   name_ru: '', name_tj: '', type: '', country: '', city: '',
   phone: '', telegram: '', whatsapp: '', wechat: '', website: '',
-  description_ru: '', description_tj: '', status: 'active', requires_subscription: false, image: '',
+  description_ru: '', description_tj: '', status: 'active', requires_subscription: false, image: '', images: [], videos: [],
   address: '', founded_year: '', employees: '', min_order: '', certifications: '', working_hours: '',
   main_products_ru: '', main_products_tj: '', capacity_ru: '', capacity_tj: '',
   delivery_terms_ru: '', delivery_terms_tj: '',
@@ -32,25 +32,56 @@ export default function FactoryManager() {
   const [bulkForm, setBulkForm] = useState({ type: '', country: '', city: '', status: '', subscription: '' });
   const [actionsOpen, setActionsOpen] = useState(false);
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
 
   const generateFactoryImage = async () => {
     setGeneratingImage(true);
     try {
       const prompt = `Professional photo of a modern manufacturing factory${form.name_ru ? ` of ${form.name_ru}` : ''}${form.city ? ` in ${form.city}` : ''}${form.country ? `, ${form.country}` : ''}. Industrial building exterior, clean daylight, realistic, wide angle, no text or watermarks.`;
       const { url } = await base44.integrations.Core.GenerateImage({ prompt });
-      setForm((prev) => ({ ...prev, image: url }));
+      setForm((prev) => ({ ...prev, images: [...prev.images, url], image: prev.image || url }));
     } finally {
       setGeneratingImage(false);
     }
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
     setUploading(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    setForm((prev) => ({ ...prev, image: file_url }));
+    const urls = [];
+    for (const file of files) {
+      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+      urls.push(file_url);
+    }
+    setForm((prev) => ({ ...prev, images: [...prev.images, ...urls], image: prev.image || urls[0] }));
     setUploading(false);
+    e.target.value = '';
+  };
+
+  const handleVideoUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setUploadingVideo(true);
+    const urls = [];
+    for (const file of files) {
+      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+      urls.push(file_url);
+    }
+    setForm((prev) => ({ ...prev, videos: [...prev.videos, ...urls] }));
+    setUploadingVideo(false);
+    e.target.value = '';
+  };
+
+  const removeImage = (idx) => {
+    setForm((prev) => {
+      const images = prev.images.filter((_, i) => i !== idx);
+      return { ...prev, images, image: images[0] || '' };
+    });
+  };
+
+  const removeVideo = (idx) => {
+    setForm((prev) => ({ ...prev, videos: prev.videos.filter((_, i) => i !== idx) }));
   };
 
   const load = async () => {
@@ -65,7 +96,8 @@ export default function FactoryManager() {
   const openNew = () => { setEditing(null); setForm(emptyForm); setShowForm(true); };
   const openEdit = (factory) => {
     setEditing(factory);
-    setForm({ ...emptyForm, ...factory });
+    const images = factory.images?.length ? factory.images : (factory.image ? [factory.image] : []);
+    setForm({ ...emptyForm, ...factory, images, videos: factory.videos || [] });
     setShowForm(true);
   };
   const closeForm = () => { setShowForm(false); setEditing(null); setForm(emptyForm); setSaveConfirm(false); };
@@ -86,6 +118,7 @@ export default function FactoryManager() {
     if (data.founded_year !== '' && data.founded_year !== undefined && data.founded_year !== null) {
       data.founded_year = Number(data.founded_year);
     }
+    data.image = data.images?.[0] || '';
     if (editing) {
       await base44.entities.Factory.update(editing.id, data);
     } else {
@@ -262,30 +295,29 @@ export default function FactoryManager() {
 
           <div className="mt-5">
             <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2">
-              {lang === 'ru' ? 'Фото завода' : 'Сурати завод'}
+              {lang === 'ru' ? 'Фотографии завода' : 'Суратҳои завод'}
             </label>
-            <div className="flex items-center gap-3">
-              {form.image ? (
-                <div className="relative w-28 h-20 rounded-xl overflow-hidden group">
-                  <img src={form.image} alt="" className="w-full h-full object-cover" />
+            <div className="flex flex-wrap items-center gap-3 mb-2">
+              {form.images.map((img, i) => (
+                <div key={i} className="relative w-28 h-20 rounded-xl overflow-hidden group">
+                  <img src={img} alt="" className="w-full h-full object-cover" />
                   <button
                     type="button"
-                    onClick={() => setForm({ ...form, image: '' })}
+                    onClick={() => removeImage(i)}
                     className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
                   >
                     <X className="w-4 h-4 text-white" />
                   </button>
                 </div>
-              ) : (
-                <label className="w-28 h-20 rounded-xl border-2 border-dashed border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 flex items-center justify-center cursor-pointer hover:border-[#C5A059] transition-colors">
-                  {uploading ? (
-                    <div className="w-5 h-5 border-2 border-[#E61D25]/20 border-t-[#E61D25] rounded-full animate-spin" />
-                  ) : (
-                    <Upload className="w-5 h-5 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30" />
-                  )}
-                  <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                </label>
-              )}
+              ))}
+              <label className="w-28 h-20 rounded-xl border-2 border-dashed border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 flex items-center justify-center cursor-pointer hover:border-[#C5A059] transition-colors">
+                {uploading ? (
+                  <div className="w-5 h-5 border-2 border-[#E61D25]/20 border-t-[#E61D25] rounded-full animate-spin" />
+                ) : (
+                  <Upload className="w-5 h-5 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30" />
+                )}
+                <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
+              </label>
               <button
                 type="button"
                 onClick={generateFactoryImage}
@@ -295,9 +327,36 @@ export default function FactoryManager() {
                 {generatingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
                 {lang === 'ru' ? 'Сгенерировать фото' : 'Сурат сохтан'}
               </button>
-              <p className="text-[11px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 max-w-[200px]">
-                {lang === 'ru' ? 'Загрузите фото или логотип завода' : 'Сурат ё логотипи заводро бор кунед'}
-              </p>
+            </div>
+            <p className="text-[11px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">
+              {lang === 'ru' ? 'Можно выбрать несколько фото сразу' : 'Метавонед якчанд сурат интихоб кунед'}
+            </p>
+
+            <label className="block text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-2 mt-4">
+              {lang === 'ru' ? 'Видео завода' : 'Видеои завод'}
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              {form.videos.map((video, i) => (
+                <div key={i} className="relative w-36 h-20 rounded-xl overflow-hidden group bg-black">
+                  <video src={video} muted playsInline preload="metadata" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeVideo(i)}
+                    className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+              ))}
+              <label className="w-36 h-20 rounded-xl border-2 border-dashed border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-[#C5A059] transition-colors">
+                {uploadingVideo ? (
+                  <div className="w-5 h-5 border-2 border-[#E61D25]/20 border-t-[#E61D25] rounded-full animate-spin" />
+                ) : (
+                  <Video className="w-5 h-5 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30" />
+                )}
+                <span className="text-[10px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">{lang === 'ru' ? 'Видео' : 'Видео'}</span>
+                <input type="file" accept="video/*" multiple onChange={handleVideoUpload} className="hidden" />
+              </label>
             </div>
           </div>
 
