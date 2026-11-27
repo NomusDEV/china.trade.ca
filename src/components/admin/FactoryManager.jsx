@@ -5,6 +5,7 @@ import { useLanguage } from '@/lib/i18n.jsx';
 import { Plus, Pencil, Trash2, Factory, ChevronDown, Settings2, Sparkles, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PRODUCT_TYPES, getTypeLabel } from '@/lib/productTypes';
+import AdminFilters, { inDateRange, textMatch } from '@/components/admin/AdminFilters';
 
 const emptyBulk = { type: '', country: '', city: '', status: '', subscription: '' };
 
@@ -21,6 +22,20 @@ export default function FactoryManager() {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState({ done: 0, total: 0 });
+  const [search, setSearch] = useState('');
+  const [fType, setFType] = useState('');
+  const [fStatus, setFStatus] = useState('');
+  const [fSub, setFSub] = useState('');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+
+  const filtered = factories.filter((f) =>
+    textMatch(`${f.name_ru || ''} ${f.name_tj || ''} ${f.city || ''} ${f.country || ''} ${f.phone || ''}`, search) &&
+    (!fType || f.type === fType) &&
+    (!fStatus || f.status === fStatus) &&
+    (!fSub || (fSub === 'yes' ? !!f.requires_subscription : !f.requires_subscription)) &&
+    inDateRange(f.created_date, from, to),
+  );
 
   const load = async () => {
     setLoading(true);
@@ -97,8 +112,8 @@ export default function FactoryManager() {
           <label className="flex items-center gap-2 text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 cursor-pointer">
             <input
               type="checkbox"
-              checked={factories.length > 0 && selected.length === factories.length}
-              onChange={(e) => setSelected(e.target.checked ? factories.map((f) => f.id) : [])}
+              checked={filtered.length > 0 && selected.length === filtered.length}
+              onChange={(e) => setSelected(e.target.checked ? filtered.map((f) => f.id) : [])}
               className="w-4 h-4 accent-[#C5A059]"
             />
             {lang === 'ru' ? 'Выбрать все' : 'Ҳамаро интихоб кардан'}
@@ -151,8 +166,49 @@ export default function FactoryManager() {
         </Button>
       </div>
 
+      <AdminFilters
+        search={search}
+        onSearch={setSearch}
+        placeholder={lang === 'ru' ? 'Поиск по названию, городу...' : 'Ҷустуҷӯ бо ном, шаҳр...'}
+        filters={[
+          {
+            key: 'type',
+            label: lang === 'ru' ? 'Все направления' : 'Ҳама самтҳо',
+            value: fType,
+            onChange: setFType,
+            options: PRODUCT_TYPES.map((tp) => ({ value: tp.value, label: lang === 'tj' ? tp.label_tj : tp.label_ru })),
+          },
+          {
+            key: 'status',
+            label: lang === 'ru' ? 'Все статусы' : 'Ҳама вазъиятҳо',
+            value: fStatus,
+            onChange: setFStatus,
+            options: [
+              { value: 'active', label: lang === 'ru' ? 'Активные' : 'Фаъол' },
+              { value: 'inactive', label: lang === 'ru' ? 'Неактивные' : 'Ғайрифаъол' },
+            ],
+          },
+          {
+            key: 'subscription',
+            label: lang === 'ru' ? 'Доступ' : 'Дастрасӣ',
+            value: fSub,
+            onChange: setFSub,
+            options: [
+              { value: 'yes', label: lang === 'ru' ? 'По подписке' : 'Бо обуна' },
+              { value: 'no', label: lang === 'ru' ? 'Открытые контакты' : 'Тамосҳои кушод' },
+            ],
+          },
+        ]}
+        dateFrom={from}
+        dateTo={to}
+        onDateFrom={setFrom}
+        onDateTo={setTo}
+        count={filtered.length}
+        total={factories.length}
+      />
+
       {bulkEdit && selected.length > 0 && (
-        <div className="p-5 rounded-md border border-[#C5A059]/40 bg-[#F3F2EF] dark:bg-white/[0.03] mb-4">
+        <div className="p-4 rounded-md border border-[#C5A059]/40 bg-[#F3F2EF] dark:bg-white/[0.03] mb-3">
           <p className="text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] mb-1">
             {lang === 'ru' ? `Редактировать выбранные заводы (${selected.length})` : `Таҳрири заводҳои интихобшуда (${selected.length})`}
           </p>
@@ -277,12 +333,16 @@ export default function FactoryManager() {
           <Factory className="w-12 h-12 mx-auto mb-3 opacity-50" />
           <p className="text-sm">{lang === 'ru' ? 'Заводов пока нет' : 'Ҳоло заводҳо нест'}</p>
         </div>
+      ) : filtered.length === 0 ? (
+        <p className="text-center py-14 text-[13px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">
+          {lang === 'ru' ? 'Ничего не найдено' : 'Чизе ёфт нашуд'}
+        </p>
       ) : (
-        <div className="space-y-3">
-          {factories.map((factory) => (
+        <div className="space-y-2 max-h-[calc(100vh-420px)] min-h-[240px] overflow-y-auto pr-1">
+          {filtered.map((factory) => (
             <div
               key={factory.id}
-              className={`flex items-center gap-4 p-4 rounded-md bg-white dark:bg-[#111111] border ${selected.includes(factory.id) ? 'border-[#C5A059]/60' : 'border-[#E4E1DA] dark:border-white/10'}`}
+              className={`flex items-center gap-3 p-3 rounded-md bg-white dark:bg-[#111111] border ${selected.includes(factory.id) ? 'border-[#C5A059]/60' : 'border-[#E4E1DA] dark:border-white/10'}`}
             >
               <input
                 type="checkbox"
@@ -292,9 +352,9 @@ export default function FactoryManager() {
               />
               <button onClick={() => navigate(`/admin/factory/${factory.id}`)} className="flex flex-1 items-center gap-4 min-w-0 text-left">
                 {factory.image ? (
-                  <img src={factory.image} alt="" className="w-11 h-11 rounded-xl object-cover flex-shrink-0" />
+                  <img src={factory.image} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
                 ) : (
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#C5A059]/15 to-[#E61D25]/10 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded bg-[#F3F2EF] dark:bg-white/5 flex items-center justify-center flex-shrink-0">
                     <Factory className="w-5 h-5 text-[#C5A059]" />
                   </div>
                 )}

@@ -2,8 +2,8 @@ import React from 'react';
 import { Package, ShoppingCart, Inbox, TrendingUp, DollarSign, Boxes, BarChart3, Box } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n.jsx';
 
-const CARD = 'border border-[#E4E1DA] dark:border-white/10 rounded-md p-5 flex flex-col gap-2.5 bg-white dark:bg-[#111111] transition-colors duration-200 hover:bg-[#FBFAF8] dark:hover:bg-white/[0.04]';
-const PANEL = 'border border-[#E4E1DA] dark:border-white/10 rounded-md p-[22px] flex flex-col gap-3.5 bg-white dark:bg-[#111111]';
+const CARD = 'border border-[#E4E1DA] dark:border-white/10 rounded-md p-3.5 flex flex-col gap-1.5 bg-white dark:bg-[#111111] transition-colors duration-200 hover:bg-[#FBFAF8] dark:hover:bg-white/[0.04]';
+const PANEL = 'border border-[#E4E1DA] dark:border-white/10 rounded-md p-4 flex flex-col gap-2.5 bg-white dark:bg-[#111111]';
 const LAB = 'text-[10.5px] tracking-[.2em] uppercase font-semibold leading-[1.4] text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60';
 const ROW = 'flex flex-col gap-1.5 py-1 transition-colors duration-200 hover:bg-[#F3F2EF] dark:hover:bg-white/[0.04]';
 const EMPTY = 'text-[13px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 text-center py-[26px] leading-[1.4]';
@@ -68,10 +68,10 @@ export default function MyListingsDashboard({ products, orders, inquiries, categ
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {cards.map(({ label, value, sub, Icon }, i) => (
           <div key={label} className={`${CARD} admin-rise admin-d${Math.min(3 + Math.floor(i / 2), 6)}`}>
-            <div className="w-9 h-9 rounded border border-[#E4E1DA] dark:border-white/10 bg-[#F3F2EF] dark:bg-white/5 flex items-center justify-center text-[#C5A059]">
-              <Icon className="w-[18px] h-[18px]" strokeWidth={1.7} />
+            <div className="w-8 h-8 rounded border border-[#E4E1DA] dark:border-white/10 bg-[#F3F2EF] dark:bg-white/5 flex items-center justify-center text-[#C5A059]">
+              <Icon className="w-4 h-4" strokeWidth={1.7} />
             </div>
-            <div className="text-[28px] font-bold tracking-[-0.02em] leading-[1.1] tabular-nums text-[#0A0A0A] dark:text-[#F9F9F9]">{value}</div>
+            <div className="text-[22px] font-bold tracking-[-0.02em] leading-[1.1] tabular-nums text-[#0A0A0A] dark:text-[#F9F9F9]">{value}</div>
             <div className={LAB}>{label}</div>
             <div className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 leading-[1.4]">{sub}</div>
           </div>
@@ -143,11 +143,11 @@ export default function MyListingsDashboard({ products, orders, inquiries, categ
         <div className={`${PANEL} admin-rise admin-d6`}>
           <div className={LAB}>{t('listings.inquiries')}</div>
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded border border-[#E4E1DA] dark:border-white/10 bg-[#F3F2EF] dark:bg-white/5 flex items-center justify-center text-[#C5A059]">
-              <Inbox className="w-[26px] h-[26px]" strokeWidth={1.7} />
+            <div className="w-11 h-11 rounded border border-[#E4E1DA] dark:border-white/10 bg-[#F3F2EF] dark:bg-white/5 flex items-center justify-center text-[#C5A059]">
+              <Inbox className="w-5 h-5" strokeWidth={1.7} />
             </div>
             <div>
-              <div className="text-[28px] font-bold tracking-[-0.02em] leading-[1.1] tabular-nums text-[#0A0A0A] dark:text-[#F9F9F9]">{newInquiries}</div>
+              <div className="text-[22px] font-bold tracking-[-0.02em] leading-[1.1] tabular-nums text-[#0A0A0A] dark:text-[#F9F9F9]">{newInquiries}</div>
               <div className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50">
                 {lang === 'ru' ? 'новых заявок' : 'дархостҳои нав'}
               </div>

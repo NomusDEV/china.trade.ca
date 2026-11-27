@@ -21,8 +21,8 @@ import AiGenerator from '@/components/admin/AiGenerator';
 
 const HERO_IMAGE = 'https://media.base44.com/images/public/6a3a2398a475362c0d768df6/e52c33c7e80ddf1a773660076ebbdce5_generated_b893fafd.jpg';
 
-const BTN = 'inline-flex items-center gap-2 text-[13px] px-4 py-2.5 rounded border border-[#0A0A0A]/15 bg-white text-[#0A0A0A] transition-colors duration-200 hover:bg-[#F3F2EF] hover:border-[#0A0A0A]/[0.33] active:bg-[#E9E7E2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A059] dark:bg-[#141414] dark:text-[#F9F9F9] dark:border-white/15';
-const BTN_PRI = 'inline-flex items-center gap-2 text-[13px] px-4 py-2.5 rounded border border-[#0A0A0A] bg-[#0A0A0A] text-white transition-colors duration-200 hover:bg-[#C5A059] hover:border-[#C5A059] active:bg-[#C5A059] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A059]';
+const BTN = 'inline-flex items-center gap-2 text-[12.5px] px-3 py-2 rounded border border-[#0A0A0A]/15 bg-white text-[#0A0A0A] transition-colors duration-200 hover:bg-[#F3F2EF] hover:border-[#0A0A0A]/[0.33] active:bg-[#E9E7E2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A059] dark:bg-[#141414] dark:text-[#F9F9F9] dark:border-white/15';
+const BTN_PRI = 'inline-flex items-center gap-2 text-[12.5px] px-3 py-2 rounded border border-[#0A0A0A] bg-[#0A0A0A] text-white transition-colors duration-200 hover:bg-[#C5A059] hover:border-[#C5A059] active:bg-[#C5A059] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A059]';
 
 const tabs = [
   { key: 'listings', icon: BarChart3, label: { ru: 'Мои объявления', tj: 'Эълонҳои ман' } },
@@ -100,8 +100,8 @@ export default function Admin() {
       <div className="mx-auto max-w-[1440px] flex flex-col lg:flex-row lg:min-h-[calc(100vh-68px)] border border-[#E4E1DA] dark:border-white/10">
 
         {/* Rail */}
-        <aside className="admin-slide-in w-full lg:w-[236px] flex-shrink-0 bg-[#F3F2EF] dark:bg-[#111111] border-b lg:border-b-0 lg:border-r border-[#E4E1DA] dark:border-white/10 py-5 lg:py-7 flex flex-row lg:flex-col gap-0.5 overflow-x-auto lg:overflow-visible">
-          <div className="hidden lg:block text-[11px] tracking-[.22em] uppercase font-bold leading-[1.4] text-[#0A0A0A] dark:text-[#F9F9F9] px-6 pb-[22px]">
+        <aside className="admin-slide-in w-full lg:w-[214px] flex-shrink-0 bg-[#F3F2EF] dark:bg-[#111111] border-b lg:border-b-0 lg:border-r border-[#E4E1DA] dark:border-white/10 py-3 lg:py-4 flex flex-row lg:flex-col gap-0.5 overflow-x-auto lg:overflow-visible">
+          <div className="hidden lg:block text-[10.5px] tracking-[.2em] uppercase font-bold leading-[1.4] text-[#0A0A0A] dark:text-[#F9F9F9] px-5 pb-3">
             {lang === 'ru' ? 'Панель администратора' : 'Панели идоракунӣ'}
           </div>
           {tabs.map((tab) => {
@@ -112,7 +112,7 @@ export default function Admin() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`relative flex items-center gap-3 w-full px-4 lg:px-6 py-3 text-sm whitespace-nowrap text-left transition-colors duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#C5A059] active:bg-[#0A0A0A]/[0.08] ${
+                className={`relative flex items-center gap-2.5 w-full px-4 lg:px-5 py-2.5 text-[13px] whitespace-nowrap text-left transition-colors duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#C5A059] active:bg-[#0A0A0A]/[0.08] ${
                   on
                     ? 'bg-white dark:bg-[#1A1A1A] text-[#0A0A0A] dark:text-[#F9F9F9] font-semibold'
                     : 'text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 hover:bg-[#0A0A0A]/[0.04] hover:text-[#0A0A0A] dark:hover:text-[#F9F9F9]'
@@ -131,7 +131,7 @@ export default function Admin() {
           })}
           <Link
             to="/"
-            className="hidden lg:flex items-center gap-3 px-6 py-3 mt-auto text-sm text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 transition-colors duration-200 hover:text-[#0A0A0A] dark:hover:text-[#F9F9F9]"
+            className="hidden lg:flex items-center gap-2.5 px-5 py-2.5 mt-auto text-[13px] text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 transition-colors duration-200 hover:text-[#0A0A0A] dark:hover:text-[#F9F9F9]"
           >
             <ArrowLeft className="w-[17px] h-[17px]" strokeWidth={1.7} />
             {lang === 'ru' ? 'На сайт' : 'Ба сайт'}
@@ -139,13 +139,13 @@ export default function Admin() {
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 px-4 sm:px-6 lg:px-9 pt-6 lg:pt-7 pb-12 flex flex-col gap-6">
+        <main className="flex-1 min-w-0 px-4 sm:px-5 lg:px-7 pt-5 pb-8 flex flex-col gap-4">
 
           {/* Hero */}
-          <section className="admin-rise relative overflow-hidden border border-[#E4E1DA] dark:border-white/10 rounded-md px-8 py-[34px] flex items-center min-h-[150px]">
+          <section className="admin-rise relative overflow-hidden border border-[#E4E1DA] dark:border-white/10 rounded-md px-6 py-4 flex items-center min-h-[92px]">
             <img src={HERO_IMAGE} alt="" className="absolute inset-0 w-full h-full object-cover rounded-md" />
             <div className="absolute inset-0 rounded-md bg-[linear-gradient(90deg,#fff_30%,#ffffffcc_62%,#ffffff33)]" />
-            <h1 className="relative text-[28px] lg:text-[34px] leading-[1.1] font-bold tracking-[-0.01em] text-[#0A0A0A]">
+            <h1 className="relative text-[22px] lg:text-[26px] leading-[1.1] font-bold tracking-[-0.01em] text-[#0A0A0A]">
               {lang === 'ru' ? 'Панель администратора' : 'Панели идоракунӣ'}
             </h1>
           </section>
@@ -155,14 +155,14 @@ export default function Admin() {
             {stats.map((stat, i) => (
               <div
                 key={stat.label}
-                className={`px-[22px] py-5 flex flex-col gap-1.5 transition-colors duration-200 hover:bg-[#F3F2EF] dark:hover:bg-white/[0.04] ${
+                className={`px-4 py-3 flex flex-col gap-0.5 transition-colors duration-200 hover:bg-[#F3F2EF] dark:hover:bg-white/[0.04] ${
                   i < stats.length - 1 ? 'border-r border-[#E4E1DA] dark:border-white/10' : ''
                 } ${i % 2 === 1 ? 'border-r-0 md:border-r' : ''} ${i < 2 ? 'border-b md:border-b-0 border-[#E4E1DA] dark:border-white/10' : ''}`}
               >
                 <span className="text-[10.5px] tracking-[.2em] uppercase font-semibold leading-[1.4] text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60">
                   {stat.label}
                 </span>
-                <span className="text-[36px] font-bold tracking-[-0.02em] leading-[1.1] tabular-nums text-[#0A0A0A] dark:text-[#F9F9F9]">
+                <span className="text-[24px] font-bold tracking-[-0.02em] leading-[1.1] tabular-nums text-[#0A0A0A] dark:text-[#F9F9F9]">
                   {stat.value}
                 </span>
               </div>
@@ -171,7 +171,7 @@ export default function Admin() {
 
           {/* Bar */}
           <section className="admin-rise admin-d2 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-[22px] font-bold leading-[1.2] text-[#0A0A0A] dark:text-[#F9F9F9]">{activeLabel}</h2>
+            <h2 className="text-[18px] font-bold leading-[1.2] text-[#0A0A0A] dark:text-[#F9F9F9]">{activeLabel}</h2>
             <div className="flex flex-wrap gap-2">
               <button onClick={() => setActiveTab('products')} className={BTN_PRI}>
                 <Plus className="w-3.5 h-3.5" strokeWidth={2} />

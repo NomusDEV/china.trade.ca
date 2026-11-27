@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, Package, ChevronDown, Settings2, Sparkles, Loader
 import { Button } from '@/components/ui/button';
 import { PRODUCT_TYPES } from '@/lib/productTypes';
 import ProductForm from '@/components/admin/ProductForm';
+import AdminFilters, { inDateRange, textMatch } from '@/components/admin/AdminFilters';
 
 const emptyBulk = { category: '', type: '', status: '', price: '' };
 const inputClass = 'w-full px-4 py-3 rounded-md border border-[#E4E1DA] dark:border-white/10 bg-white dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]';
@@ -21,6 +22,20 @@ export default function ProductManager({ products, categories, onUpdate }) {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState({ done: 0, total: 0 });
+  const [search, setSearch] = useState('');
+  const [fType, setFType] = useState('');
+  const [fCategory, setFCategory] = useState('');
+  const [fStatus, setFStatus] = useState('');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+
+  const filtered = products.filter((p) =>
+    textMatch(`${p.name_ru || ''} ${p.name_tj || ''} ${p.category || ''}`, search) &&
+    (!fType || p.type === fType) &&
+    (!fCategory || p.category === fCategory) &&
+    (!fStatus || p.status === fStatus) &&
+    inDateRange(p.created_date, from, to),
+  );
 
   const toggleSelected = (id) => {
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -89,8 +104,8 @@ export default function ProductManager({ products, categories, onUpdate }) {
           <label className="flex items-center gap-2 text-xs font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 cursor-pointer">
             <input
               type="checkbox"
-              checked={products.length > 0 && selected.length === products.length}
-              onChange={(e) => setSelected(e.target.checked ? products.map((p) => p.id) : [])}
+              checked={filtered.length > 0 && selected.length === filtered.length}
+              onChange={(e) => setSelected(e.target.checked ? filtered.map((p) => p.id) : [])}
               className="w-4 h-4 accent-[#C5A059]"
             />
             {lang === 'ru' ? 'Выбрать все' : 'Ҳамаро интихоб кардан'}
@@ -143,8 +158,46 @@ export default function ProductManager({ products, categories, onUpdate }) {
         </Button>
       </div>
 
+      <AdminFilters
+        search={search}
+        onSearch={setSearch}
+        placeholder={lang === 'ru' ? 'Поиск по названию...' : 'Ҷустуҷӯ бо ном...'}
+        filters={[
+          {
+            key: 'type',
+            label: lang === 'ru' ? 'Все типы' : 'Ҳама навъҳо',
+            value: fType,
+            onChange: setFType,
+            options: PRODUCT_TYPES.map((tp) => ({ value: tp.value, label: lang === 'tj' ? tp.label_tj : tp.label_ru })),
+          },
+          {
+            key: 'category',
+            label: lang === 'ru' ? 'Все категории' : 'Ҳама категорияҳо',
+            value: fCategory,
+            onChange: setFCategory,
+            options: categories.map((c) => ({ value: c.name_ru, label: c.name_ru })),
+          },
+          {
+            key: 'status',
+            label: lang === 'ru' ? 'Все статусы' : 'Ҳама вазъиятҳо',
+            value: fStatus,
+            onChange: setFStatus,
+            options: [
+              { value: 'active', label: lang === 'ru' ? 'Активные' : 'Фаъол' },
+              { value: 'inactive', label: lang === 'ru' ? 'Неактивные' : 'Ғайрифаъол' },
+            ],
+          },
+        ]}
+        dateFrom={from}
+        dateTo={to}
+        onDateFrom={setFrom}
+        onDateTo={setTo}
+        count={filtered.length}
+        total={products.length}
+      />
+
       {bulkEdit && selected.length > 0 && (
-        <div className="p-5 rounded-md border border-[#C5A059]/40 bg-[#F3F2EF] dark:bg-white/[0.03] mb-4">
+        <div className="p-4 rounded-md border border-[#C5A059]/40 bg-[#F3F2EF] dark:bg-white/[0.03] mb-3">
           <p className="text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] mb-1">
             {lang === 'ru' ? `Редактировать выбранные товары (${selected.length})` : `Таҳрири молҳои интихобшуда (${selected.length})`}
           </p>
@@ -259,12 +312,16 @@ export default function ProductManager({ products, categories, onUpdate }) {
           <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
           <p className="text-sm">{lang === 'ru' ? 'Нет товаров' : 'Мол нест'}</p>
         </div>
+      ) : filtered.length === 0 ? (
+        <p className="text-center py-14 text-[13px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">
+          {lang === 'ru' ? 'Ничего не найдено' : 'Чизе ёфт нашуд'}
+        </p>
       ) : (
-        <div className="space-y-3">
-          {products.map((product) => (
+        <div className="space-y-2 max-h-[calc(100vh-420px)] min-h-[240px] overflow-y-auto pr-1">
+          {filtered.map((product) => (
             <div
               key={product.id}
-              className={`flex items-center gap-4 p-4 rounded-md bg-white dark:bg-[#111111] border ${selected.includes(product.id) ? 'border-[#C5A059]/60' : 'border-[#E4E1DA] dark:border-white/10'}`}
+              className={`flex items-center gap-3 p-3 rounded-md bg-white dark:bg-[#111111] border ${selected.includes(product.id) ? 'border-[#C5A059]/60' : 'border-[#E4E1DA] dark:border-white/10'}`}
             >
               <input
                 type="checkbox"
@@ -272,7 +329,7 @@ export default function ProductManager({ products, categories, onUpdate }) {
                 onChange={() => toggleSelected(product.id)}
                 className="w-4 h-4 accent-[#C5A059] flex-shrink-0"
               />
-              <div className="w-16 h-16 rounded-lg bg-[#F0F0F0] dark:bg-[#1A1A1A] flex-shrink-0 overflow-hidden">
+              <div className="w-12 h-12 rounded bg-[#F0F0F0] dark:bg-[#1A1A1A] flex-shrink-0 overflow-hidden">
                 {product.images?.[0] ? (
                   <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
                 ) : (

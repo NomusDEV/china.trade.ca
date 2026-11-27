@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, User, Mail, Phone, MapPin, ShoppingBag, DollarSign, Calendar, ArrowLeft, Send, MessageSquare, CheckCircle, Loader2, Crown } from 'lucide-react';
+import AdminFilters, { inDateRange, textMatch } from '@/components/admin/AdminFilters';
 
 export default function ClientManager() {
   const { lang } = useLanguage();
@@ -11,6 +12,9 @@ export default function ClientManager() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [fSub, setFSub] = useState('');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
 
   const loadData = async () => {
@@ -34,11 +38,11 @@ export default function ClientManager() {
   const getUserMessages = (userId) => messages.filter(m => m.thread_user_id === userId);
   const getUserUnreadCount = (userId) => messages.filter(m => m.thread_user_id === userId && m.sender_role === 'user' && !m.read).length;
 
-  const filteredUsers = users.filter(u =>
-    u.role !== 'admin' &&
-    (u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-     u.email?.toLowerCase().includes(search.toLowerCase()) ||
-     u.phone?.includes(search))
+  const clients = users.filter((u) => u.role !== 'admin');
+  const filteredUsers = clients.filter((u) =>
+    textMatch(`${u.full_name || ''} ${u.email || ''} ${u.phone || ''}`, search) &&
+    (!fSub || (fSub === 'yes' ? !!u.subscription_active : !u.subscription_active)) &&
+    inDateRange(u.created_date, from, to),
   );
 
   const totalClients = users.filter(u => u.role !== 'admin').length;
@@ -95,20 +99,32 @@ export default function ClientManager() {
         })}
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#0A0A0A]/30 dark:text-[#F9F9F9]/30" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={lang === 'ru' ? 'Поиск по имени, email, телефону...' : 'Ҷустуҷӯ бо ном, email, телефон...'}
-          className="w-full pl-12 pr-4 py-3 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#111111] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]"
-        />
-      </div>
+      <AdminFilters
+        search={search}
+        onSearch={setSearch}
+        placeholder={lang === 'ru' ? 'Поиск по имени, email, телефону...' : 'Ҷустуҷӯ бо ном, email, телефон...'}
+        filters={[
+          {
+            key: 'subscription',
+            label: lang === 'ru' ? 'Все клиенты' : 'Ҳама муштариён',
+            value: fSub,
+            onChange: setFSub,
+            options: [
+              { value: 'yes', label: lang === 'ru' ? 'С подпиской' : 'Бо обуна' },
+              { value: 'no', label: lang === 'ru' ? 'Без подписки' : 'Бе обуна' },
+            ],
+          },
+        ]}
+        dateFrom={from}
+        dateTo={to}
+        onDateFrom={setFrom}
+        onDateTo={setTo}
+        count={filteredUsers.length}
+        total={clients.length}
+      />
 
       {/* User list */}
-      <div className="space-y-3">
+      <div className="space-y-2 max-h-[calc(100vh-440px)] min-h-[240px] overflow-y-auto pr-1">
         {filteredUsers.map((u) => {
           const userOrders = getUserOrders(u.id);
           const totalSpent = userOrders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + (o.total || 0), 0);
@@ -118,10 +134,10 @@ export default function ClientManager() {
               key={u.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5 hover:border-[#C5A059]/30 cursor-pointer transition-all"
+              className="flex items-center gap-3 p-3 rounded-md bg-white dark:bg-[#111111] border border-[#E4E1DA] dark:border-white/10 hover:border-[#C5A059]/50 cursor-pointer transition-colors"
               onClick={() => setSelectedUser(u)}
             >
-              <div className="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-[#E61D25] to-[#C5A059] flex items-center justify-center text-white font-bold flex-shrink-0">
+              <div className="w-10 h-10 rounded overflow-hidden bg-gradient-to-br from-[#E61D25] to-[#C5A059] flex items-center justify-center text-white font-bold flex-shrink-0">
                 {u.avatar ? <img src={u.avatar} alt="" className="w-full h-full object-cover" /> : (u.full_name || '?').charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">

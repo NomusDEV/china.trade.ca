@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/lib/i18n.jsx';
 import { Package, Phone, MapPin, Trash2, AlertTriangle, Check } from 'lucide-react';
+import AdminFilters, { inDateRange, textMatch } from '@/components/admin/AdminFilters';
 
 const statusConfig = {
   pending: { color: 'bg-yellow-500/10 text-yellow-500', label: { ru: 'Ожидает', tj: 'Интизор' } },
@@ -25,6 +26,10 @@ export default function OrderManager({ orders, onUpdate }) {
   const [reasonIndex, setReasonIndex] = useState(null);
   const [customReason, setCustomReason] = useState('');
   const [confirming, setConfirming] = useState(false);
+  const [search, setSearch] = useState('');
+  const [fStatus, setFStatus] = useState('');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
 
   const updateStatus = async (id, status) => {
     await base44.entities.Order.update(id, { status });
@@ -73,18 +78,47 @@ export default function OrderManager({ orders, onUpdate }) {
     onUpdate();
   };
 
-  if (orders.length === 0) {
-    return (
-      <div className="text-center py-12 text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">
-        <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p className="text-sm">{lang === 'ru' ? 'Нет заказов' : 'Фармоиш нест'}</p>
-      </div>
-    );
-  }
+  const filtered = orders.filter((o) =>
+    textMatch(`${o.customer_name || ''} ${o.customer_phone || ''} ${o.customer_address || ''}`, search) &&
+    (!fStatus || o.status === fStatus) &&
+    inDateRange(o.created_date, from, to),
+  );
 
   return (
-    <div className="space-y-4">
-      {orders.map((order) => {
+    <div>
+      <AdminFilters
+        search={search}
+        onSearch={setSearch}
+        placeholder={lang === 'ru' ? 'Поиск по клиенту, телефону...' : 'Ҷустуҷӯ бо муштарӣ, телефон...'}
+        filters={[
+          {
+            key: 'status',
+            label: lang === 'ru' ? 'Все статусы' : 'Ҳама вазъиятҳо',
+            value: fStatus,
+            onChange: setFStatus,
+            options: Object.entries(statusConfig).map(([key, cfg]) => ({ value: key, label: cfg.label[lang] || cfg.label.ru })),
+          },
+        ]}
+        dateFrom={from}
+        dateTo={to}
+        onDateFrom={setFrom}
+        onDateTo={setTo}
+        count={filtered.length}
+        total={orders.length}
+      />
+
+      {orders.length === 0 ? (
+        <div className="text-center py-12 text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">
+          <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <p className="text-sm">{lang === 'ru' ? 'Нет заказов' : 'Фармоиш нест'}</p>
+        </div>
+      ) : filtered.length === 0 ? (
+        <p className="text-center py-14 text-[13px] text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">
+          {lang === 'ru' ? 'Ничего не найдено' : 'Чизе ёфт нашуд'}
+        </p>
+      ) : (
+      <div className="space-y-2 max-h-[calc(100vh-420px)] min-h-[240px] overflow-y-auto pr-1">
+      {filtered.map((order) => {
         const status = statusConfig[order.status] || statusConfig.pending;
         const isCancelling = cancelId === order.id;
         const needsCustomReason = reasonIndex === QUICK_REASONS.length - 1;
@@ -93,7 +127,7 @@ export default function OrderManager({ orders, onUpdate }) {
         return (
           <div
             key={order.id}
-            className={`p-5 rounded-xl bg-white dark:bg-[#111111] border ${
+            className={`p-4 rounded-md bg-white dark:bg-[#111111] border ${
               order.status === 'cancelled'
                 ? 'border-red-500/30'
                 : 'border-[#0A0A0A]/5 dark:border-[#F9F9F9]/5'
@@ -247,6 +281,8 @@ export default function OrderManager({ orders, onUpdate }) {
           </div>
         );
       })}
+      </div>
+      )}
     </div>
   );
 }

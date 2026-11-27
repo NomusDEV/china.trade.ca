@@ -18,7 +18,7 @@ export default function AdminFactoryDetail() {
   const isNew = id === 'new';
   const [factory, setFactory] = useState(null);
   const [loading, setLoading] = useState(!isNew);
-  const [editing, setEditing] = useState(isNew);
+  const [editing, setEditing] = useState(true);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
@@ -89,18 +89,28 @@ export default function AdminFactoryDetail() {
       </button>
 
       {editing ? (
-        <FactoryForm
-          factory={factory}
-          onSaved={(saved) => {
-            if (isNew && saved?.id) {
-              navigate(`/admin/factory/${saved.id}`, { replace: true });
-            } else {
-              setFactory(saved);
-              setEditing(false);
-            }
-          }}
-          onCancel={() => (isNew ? navigate('/admin') : setEditing(false))}
-        />
+        <div>
+          {!isNew && (
+            <button
+              onClick={() => setEditing(false)}
+              className="inline-flex items-center gap-1.5 mb-3 px-3 py-1.5 rounded border border-[#E4E1DA] dark:border-white/10 text-[12px] font-medium text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 hover:text-[#0A0A0A] dark:hover:text-[#F9F9F9] transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" /> {lang === 'ru' ? 'Предпросмотр' : 'Пешнамоиш'}
+            </button>
+          )}
+          <FactoryForm
+            factory={factory}
+            onSaved={(saved) => {
+              if (isNew && saved?.id) {
+                navigate(`/admin/factory/${saved.id}`, { replace: true });
+              } else {
+                setFactory(saved);
+                setEditing(false);
+              }
+            }}
+            onCancel={() => (isNew ? navigate('/admin') : setEditing(false))}
+          />
+        </div>
       ) : (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
