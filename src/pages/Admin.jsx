@@ -16,6 +16,7 @@ import MyListingsDashboard from '@/components/admin/MyListingsDashboard';
 import ClientManager from '@/components/admin/ClientManager';
 import MessageCenter from '@/components/admin/MessageCenter';
 import FactoryManager from '@/components/admin/FactoryManager';
+import ProductManager from '@/components/admin/ProductManager';
 import AiGenerator from '@/components/admin/AiGenerator';
 import BackButton from '@/components/layout/BackButton';
 
@@ -140,80 +141,7 @@ export default function Admin() {
           <>
             {/* Products Tab */}
             {activeTab === 'products' && (
-              <div>
-                {showProductForm ? (
-                  <ProductForm
-                    product={editingProduct}
-                    categories={categories}
-                    onSave={handleProductSaved}
-                    onCancel={() => { setShowProductForm(false); setEditingProduct(null); }}
-                  />
-                ) : (
-                  <>
-                    <div className="flex justify-end mb-6">
-                      <Button
-                        onClick={() => { setEditingProduct(null); setShowProductForm(true); }}
-                        className="bg-[#E61D25] hover:bg-[#E61D25]/90 text-white"
-                      >
-                        <Plus className="w-4 h-4 mr-2" /> {lang === 'ru' ? 'Добавить товар' : 'Мол илова кардан'}
-                      </Button>
-                    </div>
-                    {confirmProduct && (
-                      <div className="flex flex-wrap items-center gap-3 p-4 rounded-2xl border border-red-500/30 bg-red-500/5 mb-4">
-                        <span className="text-sm text-red-500 font-medium">
-                          {lang === 'ru'
-                            ? `Удалить товар «${confirmProduct.name_ru}»?`
-                            : `Моли «${confirmProduct.name_ru}» нест карда шавад?`}
-                        </span>
-                        <button
-                          onClick={() => { deleteProduct(confirmProduct.id); setConfirmProduct(null); }}
-                          className="px-3 py-1.5 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-500/90"
-                        >
-                          {lang === 'ru' ? 'Да, удалить' : 'Бале, нест кунед'}
-                        </button>
-                        <button
-                          onClick={() => setConfirmProduct(null)}
-                          className="text-xs font-medium text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50 hover:text-[#0A0A0A] dark:hover:text-[#F9F9F9]"
-                        >
-                          {lang === 'ru' ? 'Отмена' : 'Бекор'}
-                        </button>
-                      </div>
-                    )}
-                    <div className="space-y-3">
-                      {products.map((product) => (
-                        <div key={product.id} className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-[#111111] border border-[#0A0A0A]/5 dark:border-[#F9F9F9]/5">
-                          <div className="w-16 h-16 rounded-lg bg-[#F0F0F0] dark:bg-[#1A1A1A] flex-shrink-0 overflow-hidden">
-                            {product.images?.[0] ? (
-                              <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center"><Package className="w-6 h-6 text-[#0A0A0A]/10 dark:text-[#F9F9F9]/10" /></div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-sm text-[#0A0A0A] dark:text-[#F9F9F9] truncate">{product.name_ru}</h3>
-                            <p className="text-xs text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50">{product.category} · ${product.price} · MOQ: {product.moq}</p>
-                          </div>
-                          <div className={`px-2 py-1 rounded text-[10px] font-medium ${product.status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                            {product.status}
-                          </div>
-                          <button onClick={() => { setEditingProduct(product); setShowProductForm(true); }} className="p-2 text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#C5A059] transition-colors">
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => setConfirmProduct(product)} className="p-2 text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40 hover:text-[#E61D25] transition-colors">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                      {products.length === 0 && (
-                        <div className="text-center py-12 text-[#0A0A0A]/40 dark:text-[#F9F9F9]/40">
-                          <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                          <p className="text-sm">{lang === 'ru' ? 'Нет товаров' : 'Мол нест'}</p>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
+              <ProductManager products={products} categories={categories} onUpdate={loadData} />
             )}
 
             {activeTab === 'listings' && <MyListingsDashboard products={products} orders={orders} inquiries={inquiries} categories={categories} />}

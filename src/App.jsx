@@ -24,6 +24,7 @@ import Contacts from '@/pages/Contacts';
 import Cart from '@/pages/Cart';
 import Cabinet from '@/pages/Cabinet';
 import Admin from '@/pages/Admin';
+import AdminFactoryDetail from '@/pages/AdminFactoryDetail';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -67,6 +68,7 @@ const AuthenticatedApp = () => {
         <Route path="/cart" element={<Cart />} />
         <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/factory/:id" element={<AdminFactoryDetail />} />
           <Route path="/cabinet" element={<Cabinet />} />
         </Route>
       </Route>
