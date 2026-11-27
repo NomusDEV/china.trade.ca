@@ -19,10 +19,9 @@ import FactoryManager from '@/components/admin/FactoryManager';
 import ProductManager from '@/components/admin/ProductManager';
 import AiGenerator from '@/components/admin/AiGenerator';
 
-const HERO_IMAGE = 'https://media.base44.com/images/public/6a3a2398a475362c0d768df6/e52c33c7e80ddf1a773660076ebbdce5_generated_b893fafd.jpg';
+const HERO_IMAGE = 'https://media.base44.com/images/public/6a3a2398a475362c0d768df6/55e87d9ba7d82e1e1813a310573d4863_generated_f47f8a05.jpg';
 
-const BTN = 'inline-flex items-center gap-2 text-[12.5px] px-3 py-2 rounded border border-[#0A0A0A]/15 bg-white text-[#0A0A0A] transition-colors duration-200 hover:bg-[#F3F2EF] hover:border-[#0A0A0A]/[0.33] active:bg-[#E9E7E2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A059] dark:bg-[#141414] dark:text-[#F9F9F9] dark:border-white/15';
-const BTN_PRI = 'inline-flex items-center gap-2 text-[12.5px] px-3 py-2 rounded border border-[#0A0A0A] bg-[#0A0A0A] text-white transition-colors duration-200 hover:bg-[#C5A059] hover:border-[#C5A059] active:bg-[#C5A059] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A059]';
+const BTN = 'inline-flex items-center gap-1.5 text-[11.5px] px-3 py-[7px] rounded-[2px] border border-[#C5A059] bg-[#C5A059] text-[#0B0C0E] font-semibold cursor-pointer transition-[background,box-shadow] duration-200 hover:bg-[#d6b26b] hover:shadow-[0_0_0_3px_rgba(197,160,89,0.18)] active:bg-[#b08c4a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E8E6E1]';
 
 const tabs = [
   { key: 'listings', icon: BarChart3, label: { ru: 'Мои объявления', tj: 'Эълонҳои ман' } },
@@ -72,13 +71,13 @@ export default function Admin() {
 
   if (!isAuthenticated || user?.role !== 'admin') {
     return (
-      <div className="flex-1 pt-16 lg:pt-[68px] pb-16 bg-white dark:bg-[#0A0A0A] flex items-center">
+      <div className="flex-1 pt-16 lg:pt-[68px] pb-16 bg-[#0B0C0E] flex items-center">
         <div className="max-w-md mx-auto px-4 text-center w-full">
-          <ShieldAlert className="w-14 h-14 mx-auto text-[#C5A059]/40 mb-4" strokeWidth={1.7} />
-          <h1 className="text-xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9] mb-2">
+          <ShieldAlert className="w-14 h-14 mx-auto text-[#C5A059]/50 mb-4" strokeWidth={1.6} />
+          <h1 className="text-xl font-bold text-[#E8E6E1] mb-2">
             {lang === 'ru' ? 'Доступ запрещён' : 'Дастрасӣ манъ аст'}
           </h1>
-          <p className="text-sm text-[#0A0A0A]/50 dark:text-[#F9F9F9]/50">
+          <p className="text-sm text-[#8a8780]">
             {lang === 'ru' ? 'Эта страница доступна только администраторам.' : 'Ин саҳифа танҳо барои администраторҳо дастрас аст.'}
           </p>
         </div>
@@ -88,7 +87,7 @@ export default function Admin() {
 
   const activeLabel = tabs.find((tab) => tab.key === activeTab)?.label[lang] || tabs[0].label.ru;
 
-  const stats = [
+  const chips = [
     { label: lang === 'ru' ? 'Товары' : 'Молҳо', value: products.length },
     { label: lang === 'ru' ? 'Заводы' : 'Заводҳо', value: factories.length },
     { label: lang === 'ru' ? 'Заказы' : 'Фармоишҳо', value: orders.length },
@@ -96,12 +95,12 @@ export default function Admin() {
   ];
 
   return (
-    <div className="flex-1 bg-white dark:bg-[#0A0A0A] pt-16 lg:pt-[68px]">
-      <div className="mx-auto max-w-[1440px] flex flex-col lg:flex-row lg:min-h-[calc(100vh-68px)] border border-[#E4E1DA] dark:border-white/10">
+    <div className="flex-1 bg-[#0B0C0E] text-[#E8E6E1] pt-16 lg:pt-[68px]">
+      <div className="mx-auto max-w-[1440px] min-h-[calc(100vh-68px)] flex flex-col lg:flex-row border border-[#23262b] shadow-[0_2px_14px_rgba(0,0,0,0.25)]">
 
         {/* Rail */}
-        <aside className="admin-slide-in w-full lg:w-[214px] flex-shrink-0 bg-[#F3F2EF] dark:bg-[#111111] border-b lg:border-b-0 lg:border-r border-[#E4E1DA] dark:border-white/10 py-3 lg:py-4 flex flex-row lg:flex-col gap-0.5 overflow-x-auto lg:overflow-visible">
-          <div className="hidden lg:block text-[10.5px] tracking-[.2em] uppercase font-bold leading-[1.4] text-[#0A0A0A] dark:text-[#F9F9F9] px-5 pb-3">
+        <aside className="admin-slide-in w-full lg:w-[96px] flex-none bg-[#0F1012] border-b lg:border-b-0 lg:border-r border-[#1c1f23] py-3 flex flex-row lg:flex-col gap-0.5 overflow-x-auto lg:overflow-visible">
+          <div className="hidden lg:block text-[8.5px] tracking-[.18em] uppercase font-bold leading-[1.4] text-[#C5A059] px-2.5 pb-2.5 text-center">
             {lang === 'ru' ? 'Панель администратора' : 'Панели идоракунӣ'}
           </div>
           {tabs.map((tab) => {
@@ -112,17 +111,17 @@ export default function Admin() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`relative flex items-center gap-2.5 w-full px-4 lg:px-5 py-2.5 text-[13px] whitespace-nowrap text-left transition-colors duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#C5A059] active:bg-[#0A0A0A]/[0.08] ${
+                className={`relative flex flex-col items-center gap-1 w-full py-[9px] px-1 text-[9.5px] leading-[1.2] text-center whitespace-nowrap cursor-pointer transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#C5A059] active:bg-[#1b1e22] ${
                   on
-                    ? 'bg-white dark:bg-[#1A1A1A] text-[#0A0A0A] dark:text-[#F9F9F9] font-semibold'
-                    : 'text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 hover:bg-[#0A0A0A]/[0.04] hover:text-[#0A0A0A] dark:hover:text-[#F9F9F9]'
+                    ? 'bg-[#16181b] text-[#E8E6E1] font-semibold'
+                    : 'text-[#8a8780] hover:bg-[#16181b] hover:text-[#E8E6E1]'
                 }`}
               >
                 {on && <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] bg-[#C5A059]" />}
-                <Icon className="w-[17px] h-[17px] flex-none" strokeWidth={1.7} />
+                <Icon className={`w-[17px] h-[17px] flex-none ${on ? 'text-[#C5A059]' : ''}`} strokeWidth={1.6} />
                 {tab.label[lang] || tab.label.ru}
                 {badge > 0 && (
-                  <span className="ml-auto min-w-[18px] h-[18px] px-1.5 rounded-[9px] bg-[#C5A059] text-white text-[10px] font-bold flex items-center justify-center">
+                  <span className="absolute top-[5px] right-4 min-w-[16px] h-4 px-1 rounded-[2px] bg-[#C5A059] text-[#0B0C0E] text-[9px] font-bold font-mono flex items-center justify-center">
                     {badge > 9 ? '9+' : badge}
                   </span>
                 )}
@@ -131,54 +130,52 @@ export default function Admin() {
           })}
           <Link
             to="/"
-            className="hidden lg:flex items-center gap-2.5 px-5 py-2.5 mt-auto text-[13px] text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 transition-colors duration-200 hover:text-[#0A0A0A] dark:hover:text-[#F9F9F9]"
+            className="hidden lg:flex flex-col items-center gap-1 mt-auto py-2.5 px-1 text-[9.5px] text-[#8a8780] transition-colors duration-200 hover:text-[#C5A059]"
           >
-            <ArrowLeft className="w-[17px] h-[17px]" strokeWidth={1.7} />
+            <ArrowLeft className="w-[17px] h-[17px]" strokeWidth={1.6} />
             {lang === 'ru' ? 'На сайт' : 'Ба сайт'}
           </Link>
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 px-4 sm:px-5 lg:px-7 pt-5 pb-8 flex flex-col gap-4">
+        <main className="flex-1 min-w-0 px-5 pt-4 pb-6 flex flex-col gap-3">
 
           {/* Hero */}
-          <section className="admin-rise relative overflow-hidden border border-[#E4E1DA] dark:border-white/10 rounded-md px-6 py-4 flex items-center min-h-[92px]">
-            <img src={HERO_IMAGE} alt="" className="absolute inset-0 w-full h-full object-cover rounded-md" />
-            <div className="absolute inset-0 rounded-md bg-[linear-gradient(90deg,#fff_30%,#ffffffcc_62%,#ffffff33)]" />
-            <h1 className="relative text-[22px] lg:text-[26px] leading-[1.1] font-bold tracking-[-0.01em] text-[#0A0A0A]">
+          <section className="admin-rise relative overflow-hidden border border-[#23262b] rounded-[2px] px-[22px] py-[18px] min-h-[84px] flex items-center">
+            <img src={HERO_IMAGE} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,#0B0C0E_28%,rgba(11,12,14,0.82)_60%,rgba(11,12,14,0.35))]" />
+            <h1 className="relative text-[24px] leading-[1.1] font-bold tracking-[-0.01em] text-[#E8E6E1]">
               {lang === 'ru' ? 'Панель администратора' : 'Панели идоракунӣ'}
             </h1>
           </section>
 
-          {/* Stats */}
-          <section className="admin-rise admin-d1 grid grid-cols-2 md:grid-cols-4 border border-[#E4E1DA] dark:border-white/10 rounded-md overflow-hidden">
-            {stats.map((stat, i) => (
+          {/* Chips */}
+          <section className="admin-rise grid grid-cols-2 md:grid-cols-4 gap-2" style={{ animationDelay: '.1s' }}>
+            {chips.map((chip) => (
               <div
-                key={stat.label}
-                className={`px-4 py-3 flex flex-col gap-0.5 transition-colors duration-200 hover:bg-[#F3F2EF] dark:hover:bg-white/[0.04] ${
-                  i < stats.length - 1 ? 'border-r border-[#E4E1DA] dark:border-white/10' : ''
-                } ${i % 2 === 1 ? 'border-r-0 md:border-r' : ''} ${i < 2 ? 'border-b md:border-b-0 border-[#E4E1DA] dark:border-white/10' : ''}`}
+                key={chip.label}
+                className="bg-[#131518] border border-[#23262b] rounded-[2px] px-3 py-[9px] flex items-baseline justify-between gap-2 transition-[background,box-shadow] duration-200 hover:bg-[#181b1f] hover:shadow-[inset_2px_0_0_#C5A059]"
               >
-                <span className="text-[10.5px] tracking-[.2em] uppercase font-semibold leading-[1.4] text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60">
-                  {stat.label}
+                <span className="text-[9.5px] tracking-[.22em] uppercase font-semibold leading-[1.4] text-[#8a8780]">
+                  {chip.label}
                 </span>
-                <span className="text-[24px] font-bold tracking-[-0.02em] leading-[1.1] tabular-nums text-[#0A0A0A] dark:text-[#F9F9F9]">
-                  {stat.value}
-                </span>
+                <b className="admin-flick font-mono tabular-nums text-[20px] text-[#C5A059] font-semibold leading-[1.1]">
+                  {chip.value}
+                </b>
               </div>
             ))}
           </section>
 
           {/* Bar */}
-          <section className="admin-rise admin-d2 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-[18px] font-bold leading-[1.2] text-[#0A0A0A] dark:text-[#F9F9F9]">{activeLabel}</h2>
-            <div className="flex flex-wrap gap-2">
-              <button onClick={() => setActiveTab('products')} className={BTN_PRI}>
-                <Plus className="w-3.5 h-3.5" strokeWidth={2} />
+          <section className="admin-rise flex items-center justify-between gap-3" style={{ animationDelay: '.18s' }}>
+            <h2 className="text-[16px] font-bold leading-[1.2] text-[#E8E6E1]">{activeLabel}</h2>
+            <div className="flex gap-1.5">
+              <button onClick={() => setActiveTab('products')} className={BTN}>
+                <Plus className="w-[13px] h-[13px]" strokeWidth={2} />
                 {lang === 'ru' ? 'Добавить товар' : 'Мол илова кардан'}
               </button>
-              <button onClick={() => navigate('/admin/factory/new')} className={BTN_PRI}>
-                <Plus className="w-3.5 h-3.5" strokeWidth={2} />
+              <button onClick={() => navigate('/admin/factory/new')} className={BTN}>
+                <Plus className="w-[13px] h-[13px]" strokeWidth={2} />
                 {lang === 'ru' ? 'Добавить завод' : 'Завод илова кардан'}
               </button>
             </div>
@@ -190,7 +187,7 @@ export default function Admin() {
               <div className="w-8 h-8 border-4 border-[#C5A059]/20 border-t-[#C5A059] rounded-full animate-spin" />
             </div>
           ) : (
-            <div className="admin-rise admin-d2">
+            <div className="admin-rise" style={{ animationDelay: '.18s' }}>
               {activeTab === 'listings' && (
                 <MyListingsDashboard
                   products={products}
