@@ -99,7 +99,7 @@ export default function FactoryManager() {
               type="checkbox"
               checked={factories.length > 0 && selected.length === factories.length}
               onChange={(e) => setSelected(e.target.checked ? factories.map((f) => f.id) : [])}
-              className="w-4 h-4 accent-[#E61D25]"
+              className="w-4 h-4 accent-[#C5A059]"
             />
             {lang === 'ru' ? 'Выбрать все' : 'Ҳамаро интихоб кардан'}
           </label>
@@ -114,7 +114,7 @@ export default function FactoryManager() {
                 <ChevronDown className="w-3.5 h-3.5" />
               </button>
               {actionsOpen && (
-                <div className="absolute left-0 top-full mt-2 w-56 rounded-xl bg-white dark:bg-[#111111] shadow-xl border border-black/5 dark:border-white/5 p-1 z-20">
+                <div className="absolute left-0 top-full mt-2 w-56 rounded-md bg-white dark:bg-[#111111] shadow-lg border border-[#E4E1DA] dark:border-white/10 p-1 z-20">
                   <button
                     onClick={() => { setBulkEdit(true); setActionsOpen(false); }}
                     className="flex w-full items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
@@ -146,13 +146,13 @@ export default function FactoryManager() {
             </span>
           )}
         </div>
-        <Button onClick={() => navigate('/admin/factory/new')} className="bg-[#E61D25] hover:bg-[#E61D25]/90 text-white">
+        <Button onClick={() => navigate('/admin/factory/new')} className="rounded bg-[#0A0A0A] hover:bg-[#C5A059] text-white">
           <Plus className="w-4 h-4 mr-2" /> {lang === 'ru' ? 'Добавить завод' : 'Завод илова кардан'}
         </Button>
       </div>
 
       {bulkEdit && selected.length > 0 && (
-        <div className="p-5 rounded-2xl border border-[#C5A059]/30 bg-[#C5A059]/5 mb-4">
+        <div className="p-5 rounded-md border border-[#C5A059]/40 bg-[#F3F2EF] dark:bg-white/[0.03] mb-4">
           <p className="text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] mb-1">
             {lang === 'ru' ? `Редактировать выбранные заводы (${selected.length})` : `Таҳрири заводҳои интихобшуда (${selected.length})`}
           </p>
@@ -246,7 +246,7 @@ export default function FactoryManager() {
       )}
 
       {confirmDelete && (
-        <div className="p-5 rounded-2xl border border-red-500/30 bg-red-500/5 mb-4">
+        <div className="p-5 rounded-md border border-red-500/30 bg-red-500/5 mb-4">
           <p className="text-sm font-semibold text-red-500 mb-2">
             {lang === 'ru' ? 'Вы хотите удалить:' : 'Шумо мехоҳед нест кунед:'}
           </p>
@@ -282,13 +282,13 @@ export default function FactoryManager() {
           {factories.map((factory) => (
             <div
               key={factory.id}
-              className={`flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-[#111111] border ${selected.includes(factory.id) ? 'border-[#E61D25]/40' : 'border-black/5 dark:border-white/5'}`}
+              className={`flex items-center gap-4 p-4 rounded-md bg-white dark:bg-[#111111] border ${selected.includes(factory.id) ? 'border-[#C5A059]/60' : 'border-[#E4E1DA] dark:border-white/10'}`}
             >
               <input
                 type="checkbox"
                 checked={selected.includes(factory.id)}
                 onChange={() => toggleSelected(factory.id)}
-                className="w-4 h-4 accent-[#E61D25] flex-shrink-0"
+                className="w-4 h-4 accent-[#C5A059] flex-shrink-0"
               />
               <button onClick={() => navigate(`/admin/factory/${factory.id}`)} className="flex flex-1 items-center gap-4 min-w-0 text-left">
                 {factory.image ? (

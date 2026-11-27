@@ -7,7 +7,7 @@ import { PRODUCT_TYPES } from '@/lib/productTypes';
 import ProductForm from '@/components/admin/ProductForm';
 
 const emptyBulk = { category: '', type: '', status: '', price: '' };
-const inputClass = 'w-full px-4 py-3 rounded-xl border border-[#0A0A0A]/10 dark:border-[#F9F9F9]/10 bg-white dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]';
+const inputClass = 'w-full px-4 py-3 rounded-md border border-[#E4E1DA] dark:border-white/10 bg-white dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#F9F9F9] text-sm focus:outline-none focus:border-[#C5A059]';
 
 export default function ProductManager({ products, categories, onUpdate }) {
   const { lang } = useLanguage();
@@ -91,7 +91,7 @@ export default function ProductManager({ products, categories, onUpdate }) {
               type="checkbox"
               checked={products.length > 0 && selected.length === products.length}
               onChange={(e) => setSelected(e.target.checked ? products.map((p) => p.id) : [])}
-              className="w-4 h-4 accent-[#E61D25]"
+              className="w-4 h-4 accent-[#C5A059]"
             />
             {lang === 'ru' ? 'Выбрать все' : 'Ҳамаро интихоб кардан'}
           </label>
@@ -106,7 +106,7 @@ export default function ProductManager({ products, categories, onUpdate }) {
                 <ChevronDown className="w-3.5 h-3.5" />
               </button>
               {actionsOpen && (
-                <div className="absolute left-0 top-full mt-2 w-56 rounded-xl bg-white dark:bg-[#111111] shadow-xl border border-black/5 dark:border-white/5 p-1 z-20">
+                <div className="absolute left-0 top-full mt-2 w-56 rounded-md bg-white dark:bg-[#111111] shadow-lg border border-[#E4E1DA] dark:border-white/10 p-1 z-20">
                   <button
                     onClick={() => { setBulkEdit(true); setActionsOpen(false); }}
                     className="flex w-full items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-[#0A0A0A]/70 dark:text-[#F9F9F9]/70 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
@@ -138,13 +138,13 @@ export default function ProductManager({ products, categories, onUpdate }) {
             </span>
           )}
         </div>
-        <Button onClick={() => { setEditing(null); setShowForm(true); }} className="bg-[#E61D25] hover:bg-[#E61D25]/90 text-white">
+        <Button onClick={() => { setEditing(null); setShowForm(true); }} className="rounded bg-[#0A0A0A] hover:bg-[#C5A059] text-white">
           <Plus className="w-4 h-4 mr-2" /> {lang === 'ru' ? 'Добавить товар' : 'Мол илова кардан'}
         </Button>
       </div>
 
       {bulkEdit && selected.length > 0 && (
-        <div className="p-5 rounded-2xl border border-[#C5A059]/30 bg-[#C5A059]/5 mb-4">
+        <div className="p-5 rounded-md border border-[#C5A059]/40 bg-[#F3F2EF] dark:bg-white/[0.03] mb-4">
           <p className="text-sm font-semibold text-[#0A0A0A] dark:text-[#F9F9F9] mb-1">
             {lang === 'ru' ? `Редактировать выбранные товары (${selected.length})` : `Таҳрири молҳои интихобшуда (${selected.length})`}
           </p>
@@ -228,7 +228,7 @@ export default function ProductManager({ products, categories, onUpdate }) {
       )}
 
       {confirmDelete && (
-        <div className="p-5 rounded-2xl border border-red-500/30 bg-red-500/5 mb-4">
+        <div className="p-5 rounded-md border border-red-500/30 bg-red-500/5 mb-4">
           <p className="text-sm font-semibold text-red-500 mb-2">
             {lang === 'ru' ? 'Вы хотите удалить:' : 'Шумо мехоҳед нест кунед:'}
           </p>
@@ -264,13 +264,13 @@ export default function ProductManager({ products, categories, onUpdate }) {
           {products.map((product) => (
             <div
               key={product.id}
-              className={`flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-[#111111] border ${selected.includes(product.id) ? 'border-[#E61D25]/40' : 'border-black/5 dark:border-white/5'}`}
+              className={`flex items-center gap-4 p-4 rounded-md bg-white dark:bg-[#111111] border ${selected.includes(product.id) ? 'border-[#C5A059]/60' : 'border-[#E4E1DA] dark:border-white/10'}`}
             >
               <input
                 type="checkbox"
                 checked={selected.includes(product.id)}
                 onChange={() => toggleSelected(product.id)}
-                className="w-4 h-4 accent-[#E61D25] flex-shrink-0"
+                className="w-4 h-4 accent-[#C5A059] flex-shrink-0"
               />
               <div className="w-16 h-16 rounded-lg bg-[#F0F0F0] dark:bg-[#1A1A1A] flex-shrink-0 overflow-hidden">
                 {product.images?.[0] ? (
