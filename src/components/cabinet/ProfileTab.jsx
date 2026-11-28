@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { User, Mail, Phone, MapPin, Camera, Save, CheckCircle, Shield, Trash2, Crown, BadgeCheck } from 'lucide-react';
 import AvatarUpload from '@/components/AvatarUpload';
 import PhoneVerification from '@/components/PhoneVerification';
+import NotificationsCard from '@/components/cabinet/NotificationsCard';
 
 export default function ProfileTab({ user, lang, t, country, profile, setProfile, onSave, saving, saved, roleBadge, onVerified }) {
   const { checkUserAuth } = useAuth();
@@ -46,6 +47,8 @@ export default function ProfileTab({ user, lang, t, country, profile, setProfile
 
   return (
     <div className="space-y-5">
+      <NotificationsCard />
+
       {/* Edit profile */}
       <form onSubmit={onSave} className="rounded-2xl bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5 p-6">
         <div className="flex items-center gap-3 mb-6">

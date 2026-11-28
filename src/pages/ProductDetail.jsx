@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, MessageCircle, Package, ShoppingCart, Plus, Minus } from 'lucide-react';
 import MediaGallery from '@/components/media/MediaGallery';
 import { useCart } from '@/lib/CartContext.jsx';
+import { useAuth } from '@/lib/AuthContext';
 import { useSiteSettings } from '@/lib/SiteSettingsContext.jsx';
 import ProductComments from '@/components/product/ProductComments';
 import BackButton from '@/components/layout/BackButton';
@@ -14,6 +15,7 @@ export default function ProductDetail() {
   const { id } = useParams();
   const { lang, t } = useLanguage();
   const { addItem } = useCart();
+  const { user } = useAuth();
   const { telegramLink, whatsappLink } = useSiteSettings();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +69,12 @@ export default function ProductDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Gallery */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <MediaGallery images={images} videos={product.videos || []} alt={getName()} />
+            <MediaGallery
+              images={images}
+              videos={product.videos || []}
+              alt={getName()}
+              canDownload={user?.role === 'admin' || !!user?.subscription_active}
+            />
           </motion.div>
 
           {/* Info */}

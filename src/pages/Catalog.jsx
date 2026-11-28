@@ -7,6 +7,7 @@ import { Search, ShieldCheck, Package, ShoppingCart, LayoutGrid, List, SlidersHo
 import { useCart } from '@/lib/CartContext.jsx';
 import { PRODUCT_TYPES, getTypeLabel } from '@/lib/productTypes';
 import BackButton from '@/components/layout/BackButton';
+import SubscriptionBadge from '@/components/shop/SubscriptionBadge';
 
 export default function Catalog() {
   const { lang, t } = useLanguage();
@@ -87,6 +88,7 @@ export default function Catalog() {
             <span className="text-[#C5A059] text-xs font-semibold tracking-widest uppercase">Catalog</span>
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold text-[#0A0A0A] dark:text-[#F9F9F9]">{t('catalog.title')}</h1>
+          <SubscriptionBadge className="mt-4" />
         </motion.div>
 
         {/* Product types — choose first */}

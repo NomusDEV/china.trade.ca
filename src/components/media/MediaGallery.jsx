@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Package, Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, Package, Play, Download, Lock, Crown } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n.jsx';
 
-export default function MediaGallery({ images = [], videos = [], alt = '', fallbackIcon: FallbackIcon = Package, aspect = 'aspect-square' }) {
+export default function MediaGallery({ images = [], videos = [], alt = '', fallbackIcon: FallbackIcon = Package, aspect = 'aspect-square', canDownload = false }) {
+  const { lang } = useLanguage();
   const media = [
     ...images.filter(Boolean).map((url) => ({ type: 'image', url })),
     ...videos.filter(Boolean).map((url) => ({ type: 'video', url })),
@@ -27,6 +30,29 @@ export default function MediaGallery({ images = [], videos = [], alt = '', fallb
         ) : (
           <img src={current.url} alt={alt} className="w-full h-full object-cover" />
         )}
+
+        {canDownload ? (
+          <a
+            href={current.url}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-black/50 backdrop-blur-sm text-white text-xs font-medium hover:bg-black/70 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            {lang === 'ru' ? 'Скачать' : 'Боргирӣ'}
+          </a>
+        ) : (
+          <Link
+            to="/contacts"
+            title={lang === 'ru' ? 'Скачивание доступно по подписке' : 'Боргирӣ бо обуна дастрас аст'}
+            className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-black/50 backdrop-blur-sm text-white/85 text-xs font-medium hover:bg-black/70 transition-colors"
+          >
+            <Lock className="w-4 h-4" />
+            {lang === 'ru' ? 'Скачать' : 'Боргирӣ'}
+          </Link>
+        )}
+
         {media.length > 1 && (
           <>
             <button
@@ -44,6 +70,18 @@ export default function MediaGallery({ images = [], videos = [], alt = '', fallb
           </>
         )}
       </div>
+
+      {canDownload ? (
+        <p className="flex items-center gap-1.5 text-[11px] font-medium text-[#C5A059] mb-3">
+          <Crown className="w-3.5 h-3.5" />
+          {lang === 'ru' ? 'Подписка активна — фото и видео можно скачать' : 'Обуна фаъол аст — суратҳо ва видеоҳоро боргирӣ кардан мумкин'}
+        </p>
+      ) : (
+        <p className="flex items-center gap-1.5 text-[11px] text-[#0A0A0A]/45 dark:text-[#F9F9F9]/45 mb-3">
+          <Lock className="w-3.5 h-3.5" />
+          {lang === 'ru' ? 'Скачивание фото и видео доступно по подписке' : 'Боргирии суратҳо ва видеоҳо бо обуна дастрас аст'}
+        </p>
+      )}
 
       {media.length > 1 && (
         <div className="flex gap-3 overflow-x-auto pb-1">

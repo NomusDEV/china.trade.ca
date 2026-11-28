@@ -9,6 +9,7 @@ import { PRODUCT_TYPES, getTypeLabel } from '@/lib/productTypes';
 import { telegramHref, whatsappHref } from '@/lib/factoryLinks';
 import FactoryCard from '@/components/shop/FactoryCard';
 import BackButton from '@/components/layout/BackButton';
+import SubscriptionBadge from '@/components/shop/SubscriptionBadge';
 
 function ContactLine({ Icon, label, value, href }) {
   const content = (
@@ -144,6 +145,7 @@ export default function Shop() {
               ? 'Готовые услуги для закупок из Китая: прямые контакты заводов, подбор товара, проверка поставщиков и логистика.'
               : 'Хизматрасониҳои омода барои харид аз Хитой: тамосҳои мустақими заводҳо, интихоби мол, санҷиши таъминкунанда ва логистика.'}
           </p>
+          <SubscriptionBadge className="mt-4" />
         </motion.div>
 
         {/* Services */}

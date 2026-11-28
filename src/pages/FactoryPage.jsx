@@ -6,7 +6,7 @@ import { useLanguage } from '@/lib/i18n.jsx';
 import { motion } from 'framer-motion';
 import {
   Phone, Send, Globe, MapPin, MessageSquare, Lock, Factory as FactoryIcon,
-  Calendar, Users, Package, Award, Clock, Truck, Boxes,
+  Calendar, Users, Package, Award, Clock, Truck, Boxes, CheckCircle,
 } from 'lucide-react';
 import { getTypeLabel, getTypeIcon } from '@/lib/productTypes';
 import { telegramHref, whatsappHref } from '@/lib/factoryLinks';
@@ -110,6 +110,7 @@ export default function FactoryPage() {
               alt={name}
               aspect="aspect-[4/3]"
               fallbackIcon={TypeIcon}
+              canDownload={user?.role === 'admin' || !!user?.subscription_active}
             />
           </motion.div>
 
@@ -133,9 +134,22 @@ export default function FactoryPage() {
             </p>
 
             {location && (
-              <p className="flex items-center gap-2 text-sm text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-6">
+              <p className="flex items-center gap-2 text-sm text-[#0A0A0A]/60 dark:text-[#F9F9F9]/60 mb-4">
                 <MapPin className="w-4 h-4 text-[#C5A059]" /> {location}
               </p>
+            )}
+
+            {factory.requires_subscription && (
+              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold mb-6 ${
+                locked
+                  ? 'bg-[#C5A059]/10 border border-[#C5A059]/30 text-[#C5A059]'
+                  : 'bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400'
+              }`}>
+                {locked ? <Lock className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                {locked
+                  ? (lang === 'ru' ? 'Завод работает по подписке' : 'Завод бо обуна кор мекунад')
+                  : (lang === 'ru' ? 'Завод работает по подписке — доступ открыт' : 'Завод бо обуна кор мекунад — дастрасӣ кушода аст')}
+              </div>
             )}
 
             {description && (

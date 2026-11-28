@@ -4,6 +4,7 @@ import { useLanguage } from '@/lib/i18n.jsx';
 import { useAuth } from '@/lib/AuthContext';
 import { motion } from 'framer-motion';
 import { Star, MessageSquare, Reply, Send, Loader2, MessageCircle, Pencil, Trash2, Check, X, Heart } from 'lucide-react';
+import { notifyComment } from '@/lib/notify';
 
 function StarRating({ value = 0, onChange, size = 'sm' }) {
   const [hover, setHover] = useState(0);
@@ -288,6 +289,16 @@ export default function ProductComments({ productId }) {
       parent_id: parentId,
       type: 'reply',
     });
+    const parent = comments.find((c) => c.id === parentId);
+    notifyComment({
+      recipientId: parent?.user_id,
+      actor: user,
+      type: 'reply',
+      commentId: parentId,
+      itemType: 'product',
+      itemId: productId,
+      text: replyText,
+    });
     loadComments();
   };
 
@@ -340,6 +351,16 @@ export default function ProductComments({ productId }) {
       await base44.entities.ReviewLike.delete(mine.id);
     } else {
       await base44.entities.ReviewLike.create({ review_id: id, user_id: user.id });
+      const target = comments.find((c) => c.id === id);
+      notifyComment({
+        recipientId: target?.user_id,
+        actor: user,
+        type: 'like',
+        commentId: id,
+        itemType: 'product',
+        itemId: productId,
+        text: target?.text,
+      });
     }
     if (comments.length > 0) {
       const allLikes = await base44.entities.ReviewLike.filter({ review_id: { $in: comments.map((c) => c.id) } });

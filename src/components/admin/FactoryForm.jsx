@@ -4,6 +4,7 @@ import { useLanguage } from '@/lib/i18n.jsx';
 import { Button } from '@/components/ui/button';
 import { X, Upload, Sparkles, Loader2, Video, Save } from 'lucide-react';
 import { PRODUCT_TYPES } from '@/lib/productTypes';
+import { compressImage } from '@/lib/mediaCompress';
 
 const emptyForm = {
   name_ru: '', name_tj: '', type: '', country: '', city: '',
@@ -59,7 +60,8 @@ export default function FactoryForm({ factory, onSaved, onCancel }) {
     setUploading(true);
     const urls = [];
     for (const file of files) {
-      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+      const optimized = await compressImage(file);
+      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file: optimized });
       urls.push(file_url);
     }
     setForm((prev) => ({ ...prev, images: [...prev.images, ...urls], image: prev.image || urls[0] }));

@@ -1,0 +1,93 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "recipient_id": {
+      "type": "string",
+      "description": "User ID who receives the notification"
+    },
+    "actor_id": {
+      "type": "string",
+      "description": "User ID who liked or replied"
+    },
+    "actor_name": {
+      "type": "string",
+      "description": "Display name of the user who acted"
+    },
+    "actor_avatar": {
+      "type": "string",
+      "description": "Avatar URL of the user who acted"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "like",
+        "reply"
+      ],
+      "description": "Notification type: like or reply"
+    },
+    "comment_id": {
+      "type": "string",
+      "description": "Comment or review ID that was liked or replied to"
+    },
+    "item_type": {
+      "type": "string",
+      "enum": [
+        "product",
+        "factory"
+      ],
+      "description": "Whether the comment belongs to a product or a factory"
+    },
+    "item_id": {
+      "type": "string",
+      "description": "Product or factory ID"
+    },
+    "text": {
+      "type": "string",
+      "description": "Short excerpt of the comment or reply"
+    },
+    "read": {
+      "type": "boolean",
+      "description": "Whether the recipient has seen this notification",
+      "default": false
+    }
+  },
+  "required": [
+    "recipient_id",
+    "type"
+  ],
+  "rls": {
+    "read": {
+      "data.recipient_id": "{{user.id}}"
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "data.recipient_id": "{{user.id}}"
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.recipient_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

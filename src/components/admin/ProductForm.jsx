@@ -4,6 +4,7 @@ import { useLanguage } from '@/lib/i18n.jsx';
 import { Button } from '@/components/ui/button';
 import { X, Upload, Image, Sparkles, Loader2, Video } from 'lucide-react';
 import { PRODUCT_TYPES } from '@/lib/productTypes';
+import { compressImage } from '@/lib/mediaCompress';
 
 export default function ProductForm({ product, categories, onSave, onCancel }) {
   const { lang } = useLanguage();
@@ -44,7 +45,8 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
     setUploading(true);
     const urls = [];
     for (const file of files) {
-      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+      const optimized = await compressImage(file);
+      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file: optimized });
       urls.push(file_url);
     }
     setForm((prev) => ({ ...prev, images: [...prev.images, ...urls] }));
